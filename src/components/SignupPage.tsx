@@ -135,99 +135,125 @@ export function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-purple-50 to-blue-50 dark:from-primary/10 dark:via-purple-950/20 dark:to-blue-950/20 flex items-center justify-center p-4">
-      <div className="w-full max-w-md">
+    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-violet-50 to-fuchsia-50 dark:from-purple-950/20 dark:via-violet-950/20 dark:to-fuchsia-950/20 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Background decoration */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-violet-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
+      </div>
+      
+      <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center mx-auto mb-4 shadow-lg shadow-primary/20">
-            <span className="text-white text-2xl">U</span>
+          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-purple-500 via-violet-500 to-fuchsia-500 flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-purple-500/25 ring-4 ring-purple-100 dark:ring-purple-900/30">
+            <span className="text-white text-3xl font-bold">U</span>
           </div>
-          <h1 className="mb-2">Join {APP_NAME}</h1>
-          <p className="text-muted-foreground">Connect with your university community</p>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent mb-3">Join {APP_NAME}</h1>
+          <p className="text-muted-foreground text-lg">Connect with your university community</p>
         </div>
 
-        <div className="bg-card rounded-2xl shadow-lg border border-border p-8">
+        <div className="bg-card/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-purple-100/50 dark:border-purple-900/30 p-8 relative">
           {/* Progress indicator */}
-          <div className="flex items-center gap-2 mb-8">
-            <div className={`flex-1 h-2 rounded-full ${step >= 1 ? "bg-primary" : "bg-muted"}`}></div>
-            <div className={`flex-1 h-2 rounded-full ${step >= 2 ? "bg-primary" : "bg-muted"}`}></div>
+          <div className="flex items-center gap-3 mb-8">
+            <div className={`flex-1 h-3 rounded-full transition-all duration-500 ${step >= 1 ? "bg-gradient-to-r from-purple-500 to-violet-500 shadow-lg shadow-purple-500/30" : "bg-gray-200 dark:bg-gray-700"}`}></div>
+            <div className={`flex-1 h-3 rounded-full transition-all duration-500 ${step >= 2 ? "bg-gradient-to-r from-purple-500 to-violet-500 shadow-lg shadow-purple-500/30" : "bg-gray-200 dark:bg-gray-700"}`}></div>
           </div>
 
           {step === 1 ? (
             <div className="space-y-6">
-              <div className="text-center mb-6">
-                <h2 className="text-xl font-semibold mb-2">Personal Information</h2>
-                <p className="text-sm text-muted-foreground">Tell us about yourself</p>
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold mb-3 bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">Personal Information</h2>
+                <p className="text-muted-foreground text-lg">Tell us about yourself</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <label htmlFor="firstName" className="block mb-2 text-sm">First Name</label>
+                <div className="space-y-2">
+                  <label htmlFor="firstName" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">First Name</label>
                   <Input
                     id="firstName"
                     value={formData.firstName}
                     onChange={(e) => handleInputChange("firstName", e.target.value)}
                     placeholder="John"
-                    className="rounded-xl h-11"
+                    className="rounded-2xl h-12 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300"
                     aria-invalid={!!errors.firstName}
                     aria-describedby={errors.firstName ? "firstName-error" : undefined}
                   />
                   {errors.firstName && (
-                    <p id="firstName-error" className="text-xs text-destructive mt-1">{errors.firstName}</p>
+                    <p id="firstName-error" className="text-sm text-red-500 mt-1 flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {errors.firstName}
+                    </p>
                   )}
                 </div>
-                <div>
-                  <label htmlFor="lastName" className="block mb-2 text-sm">Last Name</label>
+                <div className="space-y-2">
+                  <label htmlFor="lastName" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Last Name</label>
                   <Input
                     id="lastName"
                     value={formData.lastName}
                     onChange={(e) => handleInputChange("lastName", e.target.value)}
                     placeholder="Doe"
-                    className="rounded-xl h-11"
+                    className="rounded-2xl h-12 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300"
                     aria-invalid={!!errors.lastName}
                     aria-describedby={errors.lastName ? "lastName-error" : undefined}
                   />
                   {errors.lastName && (
-                    <p id="lastName-error" className="text-xs text-destructive mt-1">{errors.lastName}</p>
+                    <p id="lastName-error" className="text-sm text-red-500 mt-1 flex items-center gap-1">
+                      <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                        <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                      </svg>
+                      {errors.lastName}
+                    </p>
                   )}
                 </div>
               </div>
 
-              <div>
-                <label htmlFor="email" className="block mb-2 text-sm">University Email</label>
+              <div className="space-y-2">
+                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">University Email</label>
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   placeholder="john.doe@university.edu"
-                  className="rounded-xl h-11"
+                  className="rounded-2xl h-12 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300"
                   aria-invalid={!!errors.email}
                   aria-describedby={errors.email ? "email-error" : undefined}
                 />
                 {errors.email && (
-                  <p id="email-error" className="text-xs text-destructive mt-1">{errors.email}</p>
+                  <p id="email-error" className="text-sm text-red-500 mt-1 flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.email}
+                  </p>
                 )}
               </div>
 
-              <div>
-                <label htmlFor="university" className="block mb-2 text-sm">University Name</label>
+              <div className="space-y-2">
+                <label htmlFor="university" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">University Name</label>
                 <Input
                   id="university"
                   value={formData.university}
                   onChange={(e) => handleInputChange("university", e.target.value)}
                   placeholder="University of Technology"
-                  className="rounded-xl h-11"
+                  className="rounded-2xl h-12 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300"
                   aria-invalid={!!errors.university}
                   aria-describedby={errors.university ? "university-error" : undefined}
                 />
                 {errors.university && (
-                  <p id="university-error" className="text-xs text-destructive mt-1">{errors.university}</p>
+                  <p id="university-error" className="text-sm text-red-500 mt-1 flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.university}
+                  </p>
                 )}
               </div>
 
               <Button
                 onClick={handleNext}
-                className="w-full rounded-xl h-11"
+                className="w-full rounded-2xl h-14 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                 disabled={!formData.firstName || !formData.lastName || !formData.email || !formData.university}
               >
                 Continue
@@ -235,13 +261,13 @@ export function SignupPage() {
             </div>
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
-              <div className="text-center mb-6">
-                <h2 className="text-xl font-semibold mb-2">Create Password</h2>
-                <p className="text-sm text-muted-foreground">Choose a secure password</p>
+              <div className="text-center mb-8">
+                <h2 className="text-2xl font-bold mb-3 bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">Create Password</h2>
+                <p className="text-muted-foreground text-lg">Choose a secure password</p>
               </div>
 
-              <div>
-                <label htmlFor="password" className="block mb-2 text-sm">Password</label>
+              <div className="space-y-2">
+                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Password</label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -249,39 +275,47 @@ export function SignupPage() {
                     value={formData.password}
                     onChange={(e) => handleInputChange("password", e.target.value)}
                     placeholder="••••••••"
-                    className="rounded-xl h-11 pr-10"
+                    className="rounded-2xl h-12 pr-12 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300"
                     aria-invalid={!!errors.password}
                     aria-describedby={errors.password ? "password-error" : undefined}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                   >
-                    {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
                 {errors.password && (
-                  <p id="password-error" className="text-xs text-destructive mt-1">{errors.password}</p>
+                  <p id="password-error" className="text-sm text-red-500 mt-2 flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.password}
+                  </p>
                 )}
-                <div className="mt-2 space-y-1">
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <CheckCircle2 className={`w-3 h-3 ${formData.password.length >= 8 ? "text-green-500" : "text-muted-foreground"}`} />
-                    At least 8 characters
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <CheckCircle2 className={`w-3 h-3 ${/[A-Z]/.test(formData.password) ? "text-green-500" : "text-muted-foreground"}`} />
-                    One uppercase letter
-                  </div>
-                  <div className="flex items-center gap-2 text-xs text-muted-foreground">
-                    <CheckCircle2 className={`w-3 h-3 ${/[0-9]/.test(formData.password) ? "text-green-500" : "text-muted-foreground"}`} />
-                    One number
+                <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl space-y-2">
+                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Password requirements:</p>
+                  <div className="space-y-2">
+                    <div className="flex items-center gap-3 text-sm">
+                      <CheckCircle2 className={`w-4 h-4 ${formData.password.length >= 8 ? "text-green-500" : "text-gray-400"}`} />
+                      <span className={formData.password.length >= 8 ? "text-green-600 dark:text-green-400" : "text-gray-500"}>At least 8 characters</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
+                      <CheckCircle2 className={`w-4 h-4 ${/[A-Z]/.test(formData.password) ? "text-green-500" : "text-gray-400"}`} />
+                      <span className={/[A-Z]/.test(formData.password) ? "text-green-600 dark:text-green-400" : "text-gray-500"}>One uppercase letter</span>
+                    </div>
+                    <div className="flex items-center gap-3 text-sm">
+                      <CheckCircle2 className={`w-4 h-4 ${/[0-9]/.test(formData.password) ? "text-green-500" : "text-gray-400"}`} />
+                      <span className={/[0-9]/.test(formData.password) ? "text-green-600 dark:text-green-400" : "text-gray-500"}>One number</span>
+                    </div>
                   </div>
                 </div>
               </div>
 
-              <div>
-                <label htmlFor="confirmPassword" className="block mb-2 text-sm">Confirm Password</label>
+              <div className="space-y-2">
+                <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Confirm Password</label>
                 <div className="relative">
                   <Input
                     id="confirmPassword"
@@ -289,39 +323,51 @@ export function SignupPage() {
                     value={formData.confirmPassword}
                     onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
                     placeholder="••••••••"
-                    className="rounded-xl h-11 pr-10"
+                    className="rounded-2xl h-12 pr-12 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300"
                     aria-invalid={!!errors.confirmPassword}
                     aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
                   >
-                    {showConfirmPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                    {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
                 {errors.confirmPassword && (
-                  <p id="confirmPassword-error" className="text-xs text-destructive mt-1">{errors.confirmPassword}</p>
+                  <p id="confirmPassword-error" className="text-sm text-red-500 mt-2 flex items-center gap-1">
+                    <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.confirmPassword}
+                  </p>
                 )}
               </div>
 
-              <div className="flex gap-3">
+              <div className="flex gap-4">
                 <Button
                   type="button"
                   onClick={handleBack}
                   variant="outline"
-                  className="flex-1 rounded-xl h-11"
+                  className="flex-1 rounded-2xl h-14 border-2 border-gray-200 hover:border-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/20 font-semibold"
                 >
-                  <ArrowLeft className="w-4 h-4 mr-2" />
+                  <ArrowLeft className="w-5 h-5 mr-2" />
                   Back
                 </Button>
                 <Button
                   type="submit"
-                  className="flex-1 rounded-xl h-11"
+                  className="flex-1 rounded-2xl h-14 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={!formData.password || !formData.confirmPassword}
                 >
-                  Create Account
+                  {isSubmitting ? (
+                    <div className="flex items-center gap-2">
+                      <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
+                      Creating...
+                    </div>
+                  ) : (
+                    "Create Account"
+                  )}
                 </Button>
               </div>
             </form>
@@ -329,22 +375,22 @@ export function SignupPage() {
 
           {step === 1 && (
             <>
-              <div className="relative my-6">
+              <div className="relative my-8">
                 <div className="absolute inset-0 flex items-center">
-                  <div className="w-full border-t border-border"></div>
+                  <div className="w-full border-t border-purple-200 dark:border-purple-800"></div>
                 </div>
                 <div className="relative flex justify-center text-sm">
-                  <span className="px-2 bg-card text-muted-foreground">or continue with</span>
+                  <span className="px-4 bg-card text-muted-foreground font-medium">or continue with</span>
                 </div>
               </div>
 
               <Button
-                className="w-full rounded-xl mb-6 h-12 shadow-sm"
+                className="w-full rounded-2xl mb-6 h-14 shadow-lg hover:shadow-xl transition-all duration-300 bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 hover:border-purple-300 font-semibold"
                 onClick={handleGoogleSignup}
                 disabled={isSubmitting}
                 variant="outline"
               >
-                <svg className="w-5 h-5 mr-2" viewBox="0 0 24 24">
+                <svg className="w-6 h-6 mr-3" viewBox="0 0 24 24">
                   <path
                     fill="currentColor"
                     d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
@@ -362,20 +408,22 @@ export function SignupPage() {
                     d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
                   />
                 </svg>
-                Sign up with Google
+                Continue with Google
               </Button>
             </>
           )}
 
-          <p className="text-center text-sm text-muted-foreground mt-6">
-            Already have an account?{" "}
-            <button 
-              className="text-primary hover:underline"
-              onClick={() => window.history.back()}
-            >
-              Sign in
-            </button>
-          </p>
+          <div className="text-center mt-8">
+            <p className="text-gray-600 dark:text-gray-400 text-lg">
+              Already have an account?{" "}
+              <button 
+                className="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 font-semibold hover:underline transition-colors duration-200"
+                onClick={() => window.history.back()}
+              >
+                Sign in
+              </button>
+            </p>
+          </div>
         </div>
       </div>
     </div>
