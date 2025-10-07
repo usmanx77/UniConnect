@@ -11,8 +11,8 @@ class AuthService {
     await delay(1000); // Simulate network delay
 
     // Mock validation
-    if (!credentials.email.endsWith(".edu")) {
-      throw new Error("Please use your university email address");
+    if (!credentials.email.toLowerCase().endsWith(".edu.pk")) {
+      throw new Error("Please use your official .edu.pk university email address");
     }
 
     // Mock user data
@@ -81,8 +81,8 @@ class AuthService {
 
   async requestPasswordReset(email: string): Promise<void> {
     await delay(1000);
-    if (!email.endsWith(".edu")) {
-      throw new Error("Please use your university email address");
+    if (!email.toLowerCase().endsWith(".edu.pk")) {
+      throw new Error("Please use your official .edu.pk university email address");
     }
     // Mock password reset email
   }
