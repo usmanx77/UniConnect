@@ -14,7 +14,10 @@ import {
   Trash2,
   Copy,
   Check,
-  X
+  X,
+  Users,
+  Bell,
+  Settings
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
@@ -32,11 +35,11 @@ import { useAuth } from "../contexts/AuthContext";
 import { formatDistanceToNow } from "date-fns";
 import { EmojiPicker } from "./EmojiPicker";
 import { FileUpload } from "./FileUpload";
-import { MessageReactions } from "./MessageReactions";
 import { GroupChatManager } from "./GroupChatManager";
 import { ChatSettings } from "./ChatSettings";
 import { ChatNotifications } from "./ChatNotifications";
 import { MobileChatInterface } from "./MobileChatInterface";
+import type { EnhancedMessage, ChatRoom } from "../lib/services/chatService";
 
 export function ChatPage() {
   const { user } = useAuth();
@@ -46,7 +49,6 @@ export function ChatPage() {
     messages,
     typingUsers,
     isLoading,
-    error,
     searchQuery,
     searchResults,
     setCurrentRoom,
@@ -54,7 +56,6 @@ export function ChatPage() {
     editMessage,
     deleteMessage,
     addReaction,
-    removeReaction,
     startTyping,
     stopTyping,
     searchMessages,
@@ -75,7 +76,6 @@ export function ChatPage() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

@@ -57,8 +57,8 @@ export function ChatNotifications({ isOpen, onClose }: ChatNotificationsProps) {
   const handleMarkAsRead = async (notificationId: string) => {
     try {
       await notificationService.markAsRead(notificationId);
-      setNotifications(prev => 
-        prev.map(notif => 
+      setNotifications((prev: ChatNotification[]) => 
+        prev.map((notif: ChatNotification) => 
           notif.id === notificationId 
             ? { ...notif, read: true }
             : notif
@@ -72,8 +72,8 @@ export function ChatNotifications({ isOpen, onClose }: ChatNotificationsProps) {
   const handleMarkAllAsRead = async () => {
     try {
       await notificationService.markAllAsRead("current-user-id"); // Replace with actual user ID
-      setNotifications(prev => 
-        prev.map(notif => ({ ...notif, read: true }))
+      setNotifications((prev: ChatNotification[]) => 
+        prev.map((notif: ChatNotification) => ({ ...notif, read: true }))
       );
     } catch (error) {
       console.error('Failed to mark all as read:', error);
@@ -83,8 +83,8 @@ export function ChatNotifications({ isOpen, onClose }: ChatNotificationsProps) {
   const handleDeleteNotification = async (notificationId: string) => {
     try {
       // TODO: Implement delete notification API call
-      setNotifications(prev => 
-        prev.filter(notif => notif.id !== notificationId)
+      setNotifications((prev: ChatNotification[]) => 
+        prev.filter((notif: ChatNotification) => notif.id !== notificationId)
       );
     } catch (error) {
       console.error('Failed to delete notification:', error);
@@ -105,7 +105,7 @@ export function ChatNotifications({ isOpen, onClose }: ChatNotificationsProps) {
     onClose();
   };
 
-  const unreadCount = notifications.filter(n => !n.read).length;
+  const unreadCount = notifications.filter((n: ChatNotification) => !n.read).length;
 
   if (!isOpen) return null;
 
@@ -235,16 +235,16 @@ export function ChatNotifications({ isOpen, onClose }: ChatNotificationsProps) {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             {!notification.read && (
-                              <DropdownMenuItem onClick={(e) => {
-                                e.stopPropagation();
-                                handleMarkAsRead(notification.id);
-                              }}>
+                              <DropdownMenuItem                       onClick={(e: React.MouseEvent) => {
+                        e.stopPropagation();
+                        handleMarkAsRead(notification.id);
+                      }}>
                                 <Check className="h-4 w-4 mr-2" />
                                 Mark as read
                               </DropdownMenuItem>
                             )}
                             <DropdownMenuItem 
-                              onClick={(e) => {
+                              onClick={(e: React.MouseEvent) => {
                                 e.stopPropagation();
                                 handleDeleteNotification(notification.id);
                               }}

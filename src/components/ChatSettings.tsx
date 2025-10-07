@@ -11,8 +11,7 @@ import {
   Users, 
   Trash2, 
   Download,
-  Archive,
-  X
+  Archive
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Switch } from "./ui/switch";
@@ -21,8 +20,7 @@ import {
   Dialog, 
   DialogContent, 
   DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
+  DialogTitle
 } from "./ui/dialog";
 import { 
   DropdownMenu, 

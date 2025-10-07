@@ -8,8 +8,7 @@ import {
   Dialog, 
   DialogContent, 
   DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
+  DialogTitle
 } from "./ui/dialog";
 import { 
   DropdownMenu, 
@@ -216,7 +215,7 @@ export function GroupChatManager({ roomId, isOpen, onClose }: GroupChatManagerPr
                         {member.role === 'admin' && (
                           <Crown className="h-4 w-4 text-yellow-500" />
                         )}
-                        {member.role === 'owner' && (
+                        {member.role === 'admin' && member.user_id === currentRoom?.created_by && (
                           <Shield className="h-4 w-4 text-blue-500" />
                         )}
                       </div>
