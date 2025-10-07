@@ -1,7 +1,7 @@
 import { motion, AnimatePresence } from "motion/react";
 import { X, ChevronLeft, ChevronRight, Download } from "lucide-react";
 import { Button } from "./ui/button";
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 
 interface ImageLightboxProps {
   images: string[];
@@ -17,6 +17,14 @@ export function ImageLightbox({ images, initialIndex = 0, isOpen, onClose }: Ima
     setCurrentIndex(initialIndex);
   }, [initialIndex]);
 
+  const handleNext = useCallback(() => {
+    setCurrentIndex((prev) => (prev + 1) % images.length);
+  }, [images.length]);
+
+  const handlePrevious = useCallback(() => {
+    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
+  }, [images.length]);
+
   useEffect(() => {
     if (!isOpen) return;
 
@@ -28,15 +36,7 @@ export function ImageLightbox({ images, initialIndex = 0, isOpen, onClose }: Ima
 
     window.addEventListener("keydown", handleKeyDown);
     return () => window.removeEventListener("keydown", handleKeyDown);
-  }, [isOpen, currentIndex, images.length]);
-
-  const handleNext = () => {
-    setCurrentIndex((prev) => (prev + 1) % images.length);
-  };
-
-  const handlePrevious = () => {
-    setCurrentIndex((prev) => (prev - 1 + images.length) % images.length);
-  };
+  }, [isOpen, handlePrevious, handleNext, onClose]);
 
   const handleDownload = async () => {
     const image = images[currentIndex];

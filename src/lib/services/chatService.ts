@@ -1,82 +1,95 @@
-import type { 
+import type {
   MessageAttachment,
-  MessageReaction
+  MessageReaction,
+  ChatRoom,
+  ChatMember,
+  ChatMessage,
+  EnhancedMessage,
+  TypingUser,
+  CreateRoomInput,
+  SendMessageInput,
 } from "../../types";
-import { createClient } from '@supabase/supabase-js';
+import { createClient, type RealtimePostgresChangesPayload } from '@supabase/supabase-js';
 
 // Supabase configuration
 const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co';
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Enhanced Chat Types - using types from main types file
-
-export interface TypingUser {
-  user_id: string;
-  user_name: string;
-  timestamp: number;
-}
-
-export interface CreateRoomInput {
-  room_type: 'dm' | 'group' | 'society';
-  name?: string;
-  member_ids: string[];
-  society_id?: string;
-}
-
-export interface SendMessageInput {
-  room_id: string;
-  body?: string;
-  attachments?: File[];
-  reply_to?: string;
-}
-
-export interface ChatRoom {
-  id: string;
-  room_type: 'direct' | 'group' | 'society';
+type SupabaseProfile = {
   name: string;
-  avatar_url?: string;
-  university_id?: string;
-  society_id?: string;
-  created_by: string;
-  last_message_at?: string;
-  created_at: string;
-  members: ChatMember[];
-  unreadCount: number;
-  isOnline: boolean;
-  is_typing: TypingUser[];
-}
+  avatar_url?: string | null;
+  is_online?: boolean | null;
+};
 
-export interface ChatMember {
+type SupabaseRoomMemberRow = {
   user_id: string;
-  name: string;
-  avatar_url?: string;
-  role: 'owner' | 'admin' | 'member';
-  is_online: boolean;
-  last_read_at?: string;
+  role: 'member' | 'admin' | 'owner';
+  last_read_at?: string | null;
   joined_at: string;
-}
+  profiles?: SupabaseProfile | null;
+};
 
-export interface EnhancedMessage {
+type SupabaseLastMessage = {
+  id: string;
+  sender_id: string;
+  sender_name: string;
+  content: string;
+  timestamp: string;
+  read?: boolean | null;
+  type?: string | null;
+  attachment_url?: string | null;
+};
+
+type SupabaseRoomRow = {
+  id: string;
+  room_type: 'dm' | 'group' | 'society';
+  name?: string | null;
+  avatar_url?: string | null;
+  university_id?: string | null;
+  society_id?: string | null;
+  created_by: string;
+  last_message_at?: string | null;
+  created_at: string;
+  unread_count?: number | null;
+  is_online?: boolean | null;
+  room_members?: SupabaseRoomMemberRow[];
+  last_message?: SupabaseLastMessage | null;
+};
+
+type SupabaseMessageReaction = {
+  emoji: string;
+  user_id?: string;
+  userId?: string;
+};
+
+type SupabaseAttachment = {
+  id?: string;
+  path?: string;
+  type?: string;
+  fileType?: string;
+  url: string;
+  size?: number;
+  filename?: string;
+  name?: string;
+  metadata?: Record<string, unknown>;
+};
+
+type SupabaseMessageRow = {
   id: string;
   room_id: string;
   author_id: string;
-  author_name: string;
-  author_avatar?: string;
-  body: string;
-  attachments: MessageAttachment[];
-  reactions: MessageReaction[];
-  reply_to?: string;
-  edited_at?: string;
+  body?: string | null;
+  content?: string | null;
+  attachments?: SupabaseAttachment[] | null;
+  message_reactions?: SupabaseMessageReaction[] | null;
+  reply_to?: string | null;
+  edited_at?: string | null;
   created_at: string;
-  updated_at: string;
-  is_edited: boolean;
-  is_deleted: boolean;
-  senderId: string;
-  senderName: string;
-  content: string;
-  timestamp: string;
-}
+  updated_at?: string | null;
+  is_deleted?: boolean | null;
+  profiles?: SupabaseProfile | null;
+};
 
 class ChatService {
   private typingUsers = new Map<string, Map<string, TypingUser>>();
@@ -105,28 +118,7 @@ class ChatService {
 
       if (error) throw error;
 
-      return rooms.map(room => ({
-        id: room.id,
-        room_type: room.room_type,
-        name: room.name,
-        avatar_url: room.avatar_url,
-        university_id: room.university_id,
-        society_id: room.society_id,
-        created_by: room.created_by,
-        last_message_at: room.last_message_at,
-        created_at: room.created_at,
-        members: room.room_members.map(member => ({
-          user_id: member.user_id,
-          name: member.profiles.name,
-          avatar_url: member.profiles.avatar_url,
-          role: member.role,
-          last_read_at: member.last_read_at,
-          joined_at: member.joined_at,
-          is_online: member.profiles.is_online
-        })),
-        unread_count: 0, // Will be calculated separately
-        is_typing: []
-      }));
+      return rooms.map(room => this.mapRoom(room));
     } catch (error) {
       console.error('Error fetching rooms:', error);
       throw new Error('Failed to fetch chat rooms');
@@ -136,17 +128,17 @@ class ChatService {
   async createRoom(input: CreateRoomInput): Promise<ChatRoom> {
     try {
       // For DM rooms, check if room already exists
-      if (input.room_type === 'dm' && input.member_ids.length === 2) {
-        const existingRoom = await this.findDMRoom(input.member_ids[0], input.member_ids[1]);
+      if (input.roomType === 'dm' && input.memberIds.length === 2) {
+        const existingRoom = await this.findDMRoom(input.memberIds[0], input.memberIds[1]);
         if (existingRoom) return existingRoom;
       }
 
       const { data: room, error: roomError } = await supabase
         .from('rooms')
         .insert({
-          room_type: input.room_type,
+          room_type: input.roomType,
           name: input.name,
-          society_id: input.society_id,
+          society_id: input.societyId,
           created_by: (await supabase.auth.getUser()).data.user?.id
         })
         .select()
@@ -155,9 +147,9 @@ class ChatService {
       if (roomError) throw roomError;
 
       // Add members to room
-      const memberInserts = input.member_ids.map(user_id => ({
+      const memberInserts = input.memberIds.map(userId => ({
         room_id: room.id,
-        user_id,
+        user_id: userId,
         role: 'member' as const
       }));
 
@@ -199,28 +191,7 @@ class ChatService {
 
       if (error) throw error;
 
-      return {
-        id: room.id,
-        room_type: room.room_type,
-        name: room.name,
-        avatar_url: room.avatar_url,
-        university_id: room.university_id,
-        society_id: room.society_id,
-        created_by: room.created_by,
-        last_message_at: room.last_message_at,
-        created_at: room.created_at,
-        members: room.room_members.map(member => ({
-          user_id: member.user_id,
-          name: member.profiles.name,
-          avatar_url: member.profiles.avatar_url,
-          role: member.role,
-          last_read_at: member.last_read_at,
-          joined_at: member.joined_at,
-          is_online: member.profiles.is_online
-        })),
-        unread_count: 0,
-        is_typing: []
-      };
+      return this.mapRoom(room);
     } catch (error) {
       console.error('Error fetching room:', error);
       throw new Error('Failed to fetch chat room');
@@ -251,35 +222,14 @@ class ChatService {
       if (error) throw error;
 
       // Find room that has both users
-      const dmRoom = rooms.find(room => 
-        room.room_members.some(m => m.user_id === userId1) &&
-        room.room_members.some(m => m.user_id === userId2)
+      const dmRoom = rooms.find((room: SupabaseRoomRow) =>
+        (room.room_members || []).some((member) => member.user_id === userId1) &&
+        (room.room_members || []).some((member) => member.user_id === userId2)
       );
 
       if (!dmRoom) return null;
 
-      return {
-        id: dmRoom.id,
-        room_type: dmRoom.room_type,
-        name: dmRoom.name,
-        avatar_url: dmRoom.avatar_url,
-        university_id: dmRoom.university_id,
-        society_id: dmRoom.society_id,
-        created_by: dmRoom.created_by,
-        last_message_at: dmRoom.last_message_at,
-        created_at: dmRoom.created_at,
-        members: dmRoom.room_members.map(member => ({
-          user_id: member.user_id,
-          name: member.profiles.name,
-          avatar_url: member.profiles.avatar_url,
-          role: member.role,
-          last_read_at: member.last_read_at,
-          joined_at: member.joined_at,
-          is_online: member.profiles.is_online
-        })),
-        unread_count: 0,
-        is_typing: []
-      };
+      return this.mapRoom(dmRoom);
     } catch (error) {
       console.error('Error finding DM room:', error);
       return null;
@@ -308,21 +258,7 @@ class ChatService {
 
       if (error) throw error;
 
-      return messages.map(msg => ({
-        id: msg.id,
-        room_id: msg.room_id,
-        author_id: msg.author_id,
-        author_name: msg.profiles.name,
-        author_avatar: msg.profiles.avatar_url,
-        body: msg.body,
-        attachments: msg.attachments || [],
-        reactions: this.groupReactions(msg.message_reactions || []),
-        reply_to: msg.reply_to,
-        edited_at: msg.edited_at,
-        created_at: msg.created_at,
-        is_edited: !!msg.edited_at,
-        is_deleted: false
-      })).reverse(); // Reverse to show oldest first
+      return messages.map(msg => this.mapMessage(msg)).reverse(); // Reverse to show oldest first
     } catch (error) {
       console.error('Error fetching messages:', error);
       throw new Error('Failed to fetch messages');
@@ -343,11 +279,11 @@ class ChatService {
       const { data: message, error } = await supabase
         .from('messages')
         .insert({
-          room_id: input.room_id,
+          room_id: input.roomId,
           author_id: currentUser.id,
           body: input.body,
           attachments: attachments,
-          reply_to: input.reply_to
+          reply_to: input.replyTo
         })
         .select(`
           *,
@@ -364,23 +300,9 @@ class ChatService {
       await supabase
         .from('rooms')
         .update({ last_message_at: message.created_at })
-        .eq('id', input.room_id);
+        .eq('id', input.roomId);
 
-      return {
-        id: message.id,
-        room_id: message.room_id,
-        author_id: message.author_id,
-        author_name: message.profiles.name,
-        author_avatar: message.profiles.avatar_url,
-        body: message.body,
-        attachments: message.attachments || [],
-        reactions: [],
-        reply_to: message.reply_to,
-        edited_at: message.edited_at,
-        created_at: message.created_at,
-        is_edited: false,
-        is_deleted: false
-      };
+      return this.mapMessage(message);
     } catch (error) {
       console.error('Error sending message:', error);
       throw new Error('Failed to send message');
@@ -465,8 +387,8 @@ class ChatService {
       if (!currentUser) throw new Error('User not authenticated');
 
       const typingUser: TypingUser = {
-        user_id: currentUser.id,
-        user_name: currentUser.user_metadata?.name || 'Unknown',
+        userId: currentUser.id,
+        userName: currentUser.user_metadata?.name || currentUser.email || 'Unknown',
         timestamp: Date.now()
       };
 
@@ -571,21 +493,7 @@ class ChatService {
 
       if (error) throw error;
 
-      return messages.map(msg => ({
-        id: msg.id,
-        room_id: msg.room_id,
-        author_id: msg.author_id,
-        author_name: msg.profiles.name,
-        author_avatar: msg.profiles.avatar_url,
-        body: msg.body,
-        attachments: msg.attachments || [],
-        reactions: this.groupReactions(msg.message_reactions || []),
-        reply_to: msg.reply_to,
-        edited_at: msg.edited_at,
-        created_at: msg.created_at,
-        is_edited: !!msg.edited_at,
-        is_deleted: false
-      }));
+      return messages.map(msg => this.mapMessage(msg));
     } catch (error) {
       console.error('Error searching messages:', error);
       throw new Error('Failed to search messages');
@@ -603,9 +511,19 @@ class ChatService {
           table: 'messages',
           filter: `room_id=eq.${roomId}`
         }, 
-        async (payload) => {
-          const message = payload.new as any;
-          
+        async (payload: RealtimePostgresChangesPayload<SupabaseMessageRow>) => {
+          const message = payload.new;
+
+          if (
+            !message ||
+            typeof message !== 'object' ||
+            !('id' in message)
+          ) {
+            return;
+          }
+
+          const messageRow = message as SupabaseMessageRow;
+
           // Fetch complete message data
           const { data: completeMessage } = await supabase
             .from('messages')
@@ -620,27 +538,11 @@ class ChatService {
                 user_id
               )
             `)
-            .eq('id', message.id)
+            .eq('id', messageRow.id)
             .single();
 
           if (completeMessage) {
-            const enhancedMessage: EnhancedMessage = {
-              id: completeMessage.id,
-              room_id: completeMessage.room_id,
-              author_id: completeMessage.author_id,
-              author_name: completeMessage.profiles.name,
-              author_avatar: completeMessage.profiles.avatar_url,
-              body: completeMessage.body,
-              attachments: completeMessage.attachments || [],
-              reactions: this.groupReactions(completeMessage.message_reactions || []),
-              reply_to: completeMessage.reply_to,
-              edited_at: completeMessage.edited_at,
-              created_at: completeMessage.created_at,
-              is_edited: !!completeMessage.edited_at,
-              is_deleted: false
-            };
-
-            callback(enhancedMessage);
+            callback(this.mapMessage(completeMessage));
           }
         })
       .subscribe();
@@ -662,17 +564,124 @@ class ChatService {
   }
 
   // Helper Methods
-  private groupReactions(reactions: any[]): MessageReaction[] {
+  private mapMember(member: SupabaseRoomMemberRow): ChatMember {
+    return {
+      userId: member.user_id,
+      name: member.profiles?.name ?? "Unknown",
+      avatarUrl: member.profiles?.avatar_url ?? undefined,
+      role: member.role,
+      lastReadAt: member.last_read_at ?? undefined,
+      joinedAt: member.joined_at,
+      isOnline: Boolean(member.profiles?.is_online ?? false),
+    };
+  }
+
+  private normalizeMessageType(
+    type: string | null | undefined,
+  ): ChatMessage["type"] | undefined {
+    switch (type) {
+      case "text":
+      case "image":
+      case "file":
+        return type;
+      default:
+        return undefined;
+    }
+  }
+
+  private mapRoom(room: SupabaseRoomRow): ChatRoom {
+    const members = Array.isArray(room.room_members)
+      ? room.room_members.map((member) => this.mapMember(member))
+      : [];
+
+    return {
+      id: room.id,
+      roomType: room.room_type,
+      name: room.name ?? undefined,
+      avatarUrl: room.avatar_url ?? undefined,
+      universityId: room.university_id ?? undefined,
+      societyId: room.society_id ?? undefined,
+      createdBy: room.created_by,
+      lastMessageAt: room.last_message_at ?? undefined,
+      createdAt: room.created_at,
+      members,
+      unreadCount: room.unread_count ?? 0,
+      typingUsers: [],
+      isOnline: room.is_online ?? undefined,
+      lastMessage: room.last_message
+        ? {
+            id: room.last_message.id,
+            senderId: room.last_message.sender_id,
+            senderName: room.last_message.sender_name,
+            content: room.last_message.content,
+            timestamp: room.last_message.timestamp,
+            read: Boolean(room.last_message.read ?? false),
+            type: this.normalizeMessageType(room.last_message.type),
+            attachmentUrl: room.last_message.attachment_url ?? undefined,
+          }
+        : undefined,
+    };
+  }
+
+  private mapAttachments(attachments: SupabaseAttachment[] | null | undefined): MessageAttachment[] {
+    if (!Array.isArray(attachments)) {
+      return [];
+    }
+
+    return attachments.map((attachment) => ({
+      id: attachment.id ?? attachment.path ?? `${Date.now()}-${Math.random()}`,
+      type: attachment.type ?? attachment.fileType ?? "file",
+      url: attachment.url,
+      size: attachment.size ?? 0,
+      filename: attachment.filename ?? attachment.name ?? "attachment",
+      name: attachment.name,
+      metadata: attachment.metadata,
+    }));
+  }
+
+  private mapMessage(message: SupabaseMessageRow): EnhancedMessage {
+    return {
+      id: message.id,
+      roomId: message.room_id,
+      authorId: message.author_id,
+      authorName: message.profiles?.name ?? "Unknown",
+      authorAvatar: message.profiles?.avatar_url ?? undefined,
+      content: message.body ?? message.content ?? "",
+      attachments: this.mapAttachments(message.attachments),
+      reactions: this.groupReactions(message.message_reactions),
+      replyTo: message.reply_to ?? undefined,
+      editedAt: message.edited_at ?? undefined,
+      createdAt: message.created_at,
+      updatedAt: message.updated_at ?? undefined,
+      isEdited: Boolean(message.edited_at),
+      isDeleted: Boolean(message.is_deleted),
+    };
+  }
+
+  private groupReactions(reactions: SupabaseMessageReaction[] | null | undefined): MessageReaction[] {
+    if (!Array.isArray(reactions)) {
+      return [];
+    }
+
     const grouped = reactions.reduce((acc, reaction) => {
-      if (!acc[reaction.emoji]) {
-        acc[reaction.emoji] = {
-          emoji: reaction.emoji,
+      const key = reaction.emoji;
+      if (!key) {
+        return acc;
+      }
+
+      if (!acc[key]) {
+        acc[key] = {
+          emoji: key,
           users: [],
-          count: 0
+          count: 0,
         };
       }
-      acc[reaction.emoji].users.push(reaction.user_id);
-      acc[reaction.emoji].count++;
+
+      const userId = reaction.user_id ?? reaction.userId;
+      if (userId) {
+        acc[key].users.push(userId);
+      }
+      acc[key].count += 1;
       return acc;
     }, {} as Record<string, MessageReaction>);
 

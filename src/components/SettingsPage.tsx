@@ -193,8 +193,11 @@ export function SettingsPage() {
                     </p>
                     <Select
                       value={privacySettings.profileVisibility}
-                      onValueChange={(value: any) =>
-                        setPrivacySettings({ ...privacySettings, profileVisibility: value })
+                      onValueChange={(value: string) =>
+                        setPrivacySettings({
+                          ...privacySettings,
+                          profileVisibility: value as typeof privacySettings.profileVisibility,
+                        })
                       }
                     >
                       <SelectTrigger className="w-full max-w-xs">
@@ -223,8 +226,11 @@ export function SettingsPage() {
                     </p>
                     <Select
                       value={privacySettings.whoCanMessage}
-                      onValueChange={(value: any) =>
-                        setPrivacySettings({ ...privacySettings, whoCanMessage: value })
+                      onValueChange={(value: string) =>
+                        setPrivacySettings({
+                          ...privacySettings,
+                          whoCanMessage: value as typeof privacySettings.whoCanMessage,
+                        })
                       }
                     >
                       <SelectTrigger className="w-full max-w-xs">

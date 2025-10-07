@@ -57,7 +57,9 @@ export function LoginPage() {
     // Persist preference for session vs local storage
     try {
       localStorage.setItem(STORAGE_KEYS.AUTH_PERSIST, rememberMe ? "local" : "session");
-    } catch {}
+    } catch (error) {
+      console.error("Failed to persist auth preference:", error);
+    }
     
     try {
       await login({ email, password });

@@ -1,4 +1,4 @@
-import { useState, useEffect } from "react";
+import { useState, useEffect, useCallback } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { X, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
@@ -29,6 +29,58 @@ export function StoryViewer({
   const currentStory = currentGroup?.stories[currentStoryIndex];
   const STORY_DURATION = 5000; // 5 seconds
 
+  const handleNext = useCallback(() => {
+    const group = storyGroups[currentGroupIndex];
+
+    if (!group) {
+      onClose();
+      return;
+    }
+
+    if (currentStoryIndex < group.stories.length - 1) {
+      setCurrentStoryIndex((prev) => prev + 1);
+      setProgress(0);
+      return;
+    }
+
+    if (currentGroupIndex < storyGroups.length - 1) {
+      setCurrentGroupIndex((prev) => prev + 1);
+      setCurrentStoryIndex(0);
+      setProgress(0);
+      return;
+    }
+
+    onClose();
+  }, [currentGroupIndex, currentStoryIndex, onClose, storyGroups]);
+
+  const handlePrevious = useCallback(() => {
+    const group = storyGroups[currentGroupIndex];
+
+    if (!group) {
+      return;
+    }
+
+    if (currentStoryIndex > 0) {
+      setCurrentStoryIndex((prev) => prev - 1);
+      setProgress(0);
+      return;
+    }
+
+    if (currentGroupIndex > 0) {
+      const prevGroup = storyGroups[currentGroupIndex - 1];
+
+      if (!prevGroup) {
+        return;
+      }
+
+      const lastStoryIndex = Math.max(prevGroup.stories.length - 1, 0);
+
+      setCurrentGroupIndex((prev) => prev - 1);
+      setCurrentStoryIndex(lastStoryIndex);
+      setProgress(0);
+    }
+  }, [currentGroupIndex, currentStoryIndex, storyGroups]);
+
   useEffect(() => {
     if (!isOpen || isPaused) return;
 
@@ -43,38 +95,13 @@ export function StoryViewer({
     }, 100);
 
     return () => clearInterval(interval);
-  }, [isOpen, isPaused, currentGroupIndex, currentStoryIndex]);
+  }, [handleNext, isOpen, isPaused]);
 
   useEffect(() => {
     if (currentStory) {
       onView(currentStory.id);
     }
-  }, [currentStory?.id]);
-
-  const handleNext = () => {
-    if (currentStoryIndex < currentGroup.stories.length - 1) {
-      setCurrentStoryIndex(currentStoryIndex + 1);
-      setProgress(0);
-    } else if (currentGroupIndex < storyGroups.length - 1) {
-      setCurrentGroupIndex(currentGroupIndex + 1);
-      setCurrentStoryIndex(0);
-      setProgress(0);
-    } else {
-      onClose();
-    }
-  };
-
-  const handlePrevious = () => {
-    if (currentStoryIndex > 0) {
-      setCurrentStoryIndex(currentStoryIndex - 1);
-      setProgress(0);
-    } else if (currentGroupIndex > 0) {
-      setCurrentGroupIndex(currentGroupIndex - 1);
-      const prevGroup = storyGroups[currentGroupIndex - 1];
-      setCurrentStoryIndex(prevGroup.stories.length - 1);
-      setProgress(0);
-    }
-  };
+  }, [currentStory, onView]);
 
   if (!currentStory) return null;
 

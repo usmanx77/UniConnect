@@ -98,15 +98,16 @@ export function ChatPage() {
     const handleKeyDown = () => startTyping();
     const handleKeyUp = () => stopTyping();
 
-    if (inputRef.current) {
-      inputRef.current.addEventListener('keydown', handleKeyDown);
-      inputRef.current.addEventListener('keyup', handleKeyUp);
+    const inputElement = inputRef.current;
+    if (inputElement) {
+      inputElement.addEventListener('keydown', handleKeyDown);
+      inputElement.addEventListener('keyup', handleKeyUp);
     }
 
     return () => {
-      if (inputRef.current) {
-        inputRef.current.removeEventListener('keydown', handleKeyDown);
-        inputRef.current.removeEventListener('keyup', handleKeyUp);
+      if (inputElement) {
+        inputElement.removeEventListener('keydown', handleKeyDown);
+        inputElement.removeEventListener('keyup', handleKeyUp);
       }
     };
   }, [startTyping, stopTyping]);
@@ -116,9 +117,9 @@ export function ChatPage() {
 
     try {
       await sendMessage({
-        room_id: currentRoom.id,
+        roomId: currentRoom.id,
         body: messageText.trim(),
-        reply_to: replyingTo?.id
+        replyTo: replyingTo?.id
       });
       setMessageText("");
       setReplyingTo(null);
@@ -169,7 +170,7 @@ export function ChatPage() {
 
     try {
       await sendMessage({
-        room_id: currentRoom.id,
+        roomId: currentRoom.id,
         attachments: files
       });
       setShowFileUpload(false);
@@ -183,23 +184,23 @@ export function ChatPage() {
   };
 
   const getRoomName = (room: ChatRoom) => {
-    if (room.room_type === 'dm') {
-      const otherMember = room.members.find(member => member.user_id !== user?.id);
+    if (room.roomType === 'dm') {
+      const otherMember = room.members.find(member => member.userId !== user?.id);
       return otherMember?.name || 'Unknown User';
     }
     return room.name || 'Group Chat';
   };
 
   const getRoomAvatar = (room: ChatRoom) => {
-    if (room.room_type === 'dm') {
-      const otherMember = room.members.find(member => member.user_id !== user?.id);
-      return otherMember?.avatar_url;
+    if (room.roomType === 'dm') {
+      const otherMember = room.members.find(member => member.userId !== user?.id);
+      return otherMember?.avatarUrl;
     }
-    return room.avatar_url;
+    return room.avatarUrl;
   };
 
   const isMyMessage = (message: EnhancedMessage) => {
-    return message.author_id === user?.id;
+    return message.authorId === user?.id;
   };
 
   const getDisplayMessages = () => {
@@ -301,7 +302,7 @@ export function ChatPage() {
                         {getRoomName(room).charAt(0)}
                       </AvatarFallback>
                     </Avatar>
-                    {room.members.some((member: any) => member.is_online && member.user_id !== user?.id) && (
+                    {room.members.some(member => member.isOnline && member.userId !== user?.id) && (
                       <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card"></span>
                     )}
                   </div>
@@ -309,16 +310,16 @@ export function ChatPage() {
                     <div className="flex items-center justify-between mb-1">
                       <h4 className="text-sm font-medium truncate">{getRoomName(room)}</h4>
                       <span className="text-xs text-muted-foreground">
-                        {formatTime(room.last_message_at)}
+                        {room.lastMessageAt ? formatTime(room.lastMessageAt) : "—"}
                       </span>
                     </div>
                     <div className="flex items-center justify-between">
                       <p className="text-sm text-muted-foreground truncate">
-                        {room.last_message_at ? 'Last message...' : 'No messages yet'}
+                        {room.lastMessageAt ? 'Last message...' : 'No messages yet'}
                       </p>
-                      {room.unread_count > 0 && (
+                      {room.unreadCount > 0 && (
                         <Badge variant="default" className="ml-2 text-xs px-2 py-0.5">
-                          {room.unread_count}
+                          {room.unreadCount}
                         </Badge>
                       )}
                     </div>
@@ -352,9 +353,9 @@ export function ChatPage() {
                 <div className="flex-1">
                   <h4 className="text-sm font-medium">{getRoomName(currentRoom)}</h4>
                   <p className="text-xs text-muted-foreground">
-                    {typingUsers.length > 0 
-                      ? `${typingUsers.map(u => u.user_name).join(', ')} typing...`
-                      : `${currentRoom.members.filter((m: any) => m.is_online).length} online`
+                    {typingUsers.length > 0
+                      ? `${typingUsers.map(u => u.userName).join(', ')} typing...`
+                      : `${currentRoom.members.filter(member => member.isOnline).length} online`
                     }
                   </p>
                 </div>
@@ -414,7 +415,7 @@ export function ChatPage() {
                     >
                       <div className={`max-w-[70%] group`}>
                         {/* Reply indicator */}
-                        {message.reply_to && (
+                        {message.replyTo && (
                           <div className="mb-2 ml-4 p-2 bg-muted rounded-lg border-l-2 border-primary">
                             <p className="text-xs text-muted-foreground">Replying to message</p>
                           </div>
@@ -429,10 +430,10 @@ export function ChatPage() {
                         >
                           {!isMyMessage(message) && (
                             <p className="text-xs font-medium mb-1 opacity-70">
-                              {message.author_name}
+                              {message.authorName}
                             </p>
                           )}
-                          
+
                           {editingMessage === message.id ? (
                             <div className="space-y-2">
                               <Textarea
@@ -466,12 +467,12 @@ export function ChatPage() {
                             </div>
                           ) : (
                             <>
-                              <p className="text-sm whitespace-pre-wrap">{message.body}</p>
-                              
+                              <p className="text-sm whitespace-pre-wrap">{message.content}</p>
+
                               {/* Attachments */}
                               {message.attachments.length > 0 && (
                                 <div className="mt-2 space-y-2">
-                                  {message.attachments.map((attachment: any) => (
+                                  {message.attachments.map((attachment) => (
                                     <div key={attachment.id} className="max-w-xs">
                                       {attachment.type === 'image' ? (
                                         <img
@@ -496,8 +497,8 @@ export function ChatPage() {
                                     isMyMessage(message) ? "text-white/70" : "text-muted-foreground"
                                   }`}
                                 >
-                                  {formatTime(message.created_at)}
-                                  {message.is_edited && " (edited)"}
+                                  {formatTime(message.createdAt)}
+                                  {message.isEdited && " (edited)"}
                                 </p>
                                 
                                 {isMyMessage(message) && (
@@ -514,7 +515,7 @@ export function ChatPage() {
                                     <DropdownMenuContent align="end">
                                       <DropdownMenuItem onClick={() => {
                                         setEditingMessage(message.id);
-                                        setEditText(message.body || "");
+                                        setEditText(message.content || "");
                                       }}>
                                         <Edit className="h-3 w-3 mr-2" />
                                         Edit
@@ -524,7 +525,7 @@ export function ChatPage() {
                                         Delete
                                       </DropdownMenuItem>
                                       <DropdownMenuItem onClick={() => {
-                                        navigator.clipboard.writeText(message.body || "");
+                                        navigator.clipboard.writeText(message.content || "");
                                       }}>
                                         <Copy className="h-3 w-3 mr-2" />
                                         Copy
@@ -540,7 +541,7 @@ export function ChatPage() {
                         {/* Message Reactions */}
                         {message.reactions.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-1 ml-4">
-                            {message.reactions.map((reaction: any) => (
+                            {message.reactions.map((reaction) => (
                               <Button
                                 key={reaction.emoji}
                                 variant="outline"
@@ -567,7 +568,7 @@ export function ChatPage() {
                     <div className="flex items-center gap-2">
                       <Reply className="h-4 w-4 text-muted-foreground" />
                       <span className="text-sm text-muted-foreground">
-                        Replying to {replyingTo.author_name}
+                        Replying to {replyingTo.authorName}
                       </span>
                     </div>
                     <Button
@@ -580,7 +581,7 @@ export function ChatPage() {
                     </Button>
                   </div>
                   <p className="text-xs text-muted-foreground mt-1 truncate">
-                    {replyingTo.body}
+                    {replyingTo.content}
                   </p>
                 </div>
               )}

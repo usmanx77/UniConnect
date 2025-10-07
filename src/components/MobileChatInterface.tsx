@@ -16,6 +16,7 @@ import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useChat } from "../contexts/ChatContext";
 import { useAuth } from "../contexts/AuthContext";
 import { formatDistanceToNow } from "date-fns";
+import type { ChatRoom, EnhancedMessage } from "../types";
 
 interface MobileChatInterfaceProps {
   onBack: () => void;
@@ -69,7 +70,7 @@ export function MobileChatInterface({ onBack }: MobileChatInterfaceProps) {
 
     try {
       await sendMessage({
-        room_id: currentRoom.id,
+        roomId: currentRoom.id,
         body: messageText.trim()
       });
       setMessageText("");
@@ -93,24 +94,24 @@ export function MobileChatInterface({ onBack }: MobileChatInterfaceProps) {
     stopTyping();
   };
 
-  const getRoomName = (room: any) => {
-    if (room.room_type === 'dm') {
-      const otherMember = room.members.find((member: any) => member.user_id !== user?.id);
+  const getRoomName = (room: ChatRoom) => {
+    if (room.roomType === 'dm') {
+      const otherMember = room.members.find(member => member.userId !== user?.id);
       return otherMember?.name || 'Unknown User';
     }
     return room.name || 'Group Chat';
   };
 
-  const getRoomAvatar = (room: any) => {
-    if (room.room_type === 'dm') {
-      const otherMember = room.members.find((member: any) => member.user_id !== user?.id);
-      return otherMember?.avatar_url;
+  const getRoomAvatar = (room: ChatRoom) => {
+    if (room.roomType === 'dm') {
+      const otherMember = room.members.find(member => member.userId !== user?.id);
+      return otherMember?.avatarUrl;
     }
-    return room.avatar_url;
+    return room.avatarUrl;
   };
 
-  const isMyMessage = (message: any) => {
-    return message.author_id === user?.id;
+  const isMyMessage = (message: EnhancedMessage) => {
+    return message.authorId === user?.id;
   };
 
   const formatTime = (timestamp: string) => {
@@ -156,9 +157,9 @@ export function MobileChatInterface({ onBack }: MobileChatInterfaceProps) {
         <div className="flex-1 min-w-0">
           <h4 className="text-sm font-medium truncate">{getRoomName(currentRoom)}</h4>
           <p className="text-xs text-muted-foreground">
-            {typingUsers.length > 0 
-              ? `${typingUsers.map(u => u.user_name).join(', ')} typing...`
-              : `${currentRoom.members.filter((m: any) => m.is_online).length} online`
+            {typingUsers.length > 0
+              ? `${typingUsers.map(u => u.userName).join(', ')} typing...`
+              : `${currentRoom.members.filter(member => member.isOnline).length} online`
             }
           </p>
         </div>
@@ -206,11 +207,11 @@ export function MobileChatInterface({ onBack }: MobileChatInterfaceProps) {
                 >
                   {!isMyMessage(message) && (
                     <p className="text-xs font-medium mb-1 opacity-70">
-                      {message.author_name}
+                      {message.authorName}
                     </p>
                   )}
-                  
-                  <p className="text-sm whitespace-pre-wrap">{message.body}</p>
+
+                  <p className="text-sm whitespace-pre-wrap">{message.content}</p>
                   
                   {/* Attachments */}
                   {message.attachments.length > 0 && (
@@ -239,8 +240,8 @@ export function MobileChatInterface({ onBack }: MobileChatInterfaceProps) {
                       isMyMessage(message) ? "text-white/70" : "text-muted-foreground"
                     }`}
                   >
-                    {formatTime(message.created_at)}
-                    {message.is_edited && " (edited)"}
+                    {formatTime(message.createdAt)}
+                    {message.isEdited && " (edited)"}
                   </p>
                 </div>
                 
