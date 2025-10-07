@@ -20,7 +20,7 @@ export function StoriesBar() {
 
   return (
     <>
-      <div className="bg-card border border-border rounded-2xl shadow-sm">
+      <div className="bg-card border border-border rounded-lg shadow-sm">
         <ScrollArea className="w-full">
           <div className="flex gap-4 p-4 overflow-x-auto">
             {/* Add Story Button */}

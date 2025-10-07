@@ -12,7 +12,7 @@ export function SocietyCard(society: Society) {
     <motion.div
       initial={{ opacity: 0, scale: 0.95 }}
       animate={{ opacity: 1, scale: 1 }}
-      className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm hover:shadow-md transition-all"
+      className="bg-card rounded-lg border border-border overflow-hidden shadow-sm hover:shadow-md transition-all"
     >
       <div className="p-4">
         <div className="flex items-start gap-3 mb-3">
