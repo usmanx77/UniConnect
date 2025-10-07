@@ -1691,7 +1691,13 @@ CREATE POLICY "Users can create reports"
 CREATE POLICY "Admins can view moderation log"
   ON moderation_log FOR SELECT
   TO authenticated
-  USING (true); -- TODO: Add admin role check
+  USING (
+    EXISTS (
+      SELECT 1 FROM user_profiles 
+      WHERE user_profiles.user_id = auth.uid() 
+      AND user_profiles.role = 'admin'
+    )
+  );
 
 -- =====================================================
 -- 17. SEED DATA
