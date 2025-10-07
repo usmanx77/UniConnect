@@ -25,11 +25,8 @@ export function LoginPage() {
 
   const handleGoogleLogin = async () => {
     try {
-      // Simulate Google OAuth
-      await login({
-        email: "student@nu.edu.pk",
-        password: "password123",
-      });
+      await authService.loginWithOAuth("google");
+      // If Supabase is configured, this will redirect. Otherwise, fallback succeeded.
       toast.success(toast.messages.success.LOGIN_SUCCESS);
     } catch {
       toast.error(toast.messages.error.AUTH_FAILED);
@@ -74,25 +71,25 @@ export function LoginPage() {
     return <LoadingSpinner fullScreen size="lg" text="Signing in..." />;
   }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-violet-50 to-fuchsia-50 dark:from-purple-950/20 dark:via-violet-950/20 dark:to-fuchsia-950/20 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-accent/5 to-primary/10 dark:from-primary/10 dark:via-accent/10 dark:to-primary/20 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-violet-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-accent/20 to-primary/20 rounded-full blur-3xl"></div>
       </div>
       
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-purple-500 via-violet-500 to-fuchsia-500 flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-purple-500/25 ring-4 ring-purple-100 dark:ring-purple-900/30">
+          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-primary/25 ring-4 ring-primary/10 dark:ring-primary/30">
             <span className="text-white text-3xl font-bold">U</span>
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent mb-3">UniConnect</h1>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-3">UniConnect</h1>
           <p className="text-muted-foreground text-lg">Connect with your university community</p>
         </div>
 
-        <div className="bg-card/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-purple-100/50 dark:border-purple-900/30 p-8 relative">
+        <div className="bg-card/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-border p-8 relative">
           <Button
-            className="w-full rounded-2xl mb-6 h-14 shadow-lg hover:shadow-xl transition-all duration-300 bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 hover:border-purple-300 font-semibold"
+            className="w-full rounded-2xl mb-6 h-14 shadow-lg hover:shadow-xl transition-all duration-300 bg-card hover:bg-accent text-foreground border-2 border-border hover:border-primary/40 font-semibold"
             onClick={handleGoogleLogin}
             disabled={isLoading}
           >
@@ -119,7 +116,7 @@ export function LoginPage() {
 
           <div className="relative mb-8">
             <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-purple-200 dark:border-purple-800"></div>
+              <div className="w-full border-t border-border"></div>
             </div>
             <div className="relative flex justify-center text-sm">
               <span className="px-4 bg-card text-muted-foreground font-medium">or continue with email</span>
@@ -128,20 +125,20 @@ export function LoginPage() {
 
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">University Email</label>
+              <label htmlFor="email" className="block text-sm font-semibold text-foreground">University Email</label>
               <Input
                 id="email"
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
                 placeholder="yourname@your-university.edu.pk"
-                className="rounded-2xl h-14 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300 text-lg px-4"
+                className="rounded-2xl h-14 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300 text-lg px-4"
                 required
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? "email-error" : undefined}
               />
               {errors.email && (
-                <p id="email-error" className="text-sm text-red-500 mt-2 flex items-center gap-1">
+                <p id="email-error" className="text-sm text-destructive mt-2 flex items-center gap-1">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
@@ -150,7 +147,7 @@ export function LoginPage() {
               )}
             </div>
             <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Password</label>
+              <label htmlFor="password" className="block text-sm font-semibold text-foreground">Password</label>
               <div className="relative">
                 <Input
                   id="password"
@@ -158,7 +155,7 @@ export function LoginPage() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="rounded-2xl h-14 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300 text-lg px-4 pr-12"
+                  className="rounded-2xl h-14 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300 text-lg px-4 pr-12"
                   required
                   aria-invalid={!!errors.password}
                   aria-describedby={errors.password ? "password-error" : undefined}
@@ -166,13 +163,13 @@ export function LoginPage() {
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
               {errors.password && (
-                <p id="password-error" className="text-sm text-red-500 mt-2 flex items-center gap-1">
+                <p id="password-error" className="text-sm text-destructive mt-2 flex items-center gap-1">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                     <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                   </svg>
@@ -181,10 +178,10 @@ export function LoginPage() {
               )}
             </div>
             <div className="flex items-center justify-between">
-              <label className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
+              <label className="flex items-center gap-3 text-sm text-muted-foreground">
                 <input
                   type="checkbox"
-                  className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                  className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
                   checked={rememberMe}
                   onChange={(e) => setRememberMe(e.target.checked)}
                 />
@@ -192,7 +189,7 @@ export function LoginPage() {
               </label>
               <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
                 <DialogTrigger asChild>
-                  <button type="button" className="text-sm text-purple-600 hover:text-purple-700 font-semibold">Forgot password?</button>
+                  <button type="button" className="text-sm text-primary hover:text-primary/80 font-semibold">Forgot password?</button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
@@ -210,8 +207,8 @@ export function LoginPage() {
                         setResetSent(false);
                       }}
                     />
-                    {resetError && <p className="text-sm text-red-500">{resetError}</p>}
-                    {resetSent && <p className="text-sm text-green-600">If an account exists, a reset email was sent.</p>}
+                    {resetError && <p className="text-sm text-destructive">{resetError}</p>}
+                    {resetSent && <p className="text-sm text-primary">If an account exists, a reset email was sent.</p>}
                   </div>
                   <DialogFooter>
                     <Button
@@ -238,7 +235,7 @@ export function LoginPage() {
             </div>
             <Button
               type="submit"
-              className="w-full rounded-2xl h-14 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+              className="w-full rounded-2xl h-14 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -252,18 +249,18 @@ export function LoginPage() {
             </Button>
           </form>
 
-          <div className="text-center mt-8 p-4 bg-purple-50 dark:bg-purple-950/20 rounded-2xl border border-purple-100 dark:border-purple-900/30">
-            <p className="text-sm text-purple-700 dark:text-purple-300 font-medium">
+          <div className="text-center mt-8 p-4 bg-accent rounded-2xl border border-border">
+            <p className="text-sm text-primary font-medium">
               🔒 Only official .edu.pk university emails are allowed
             </p>
           </div>
         </div>
 
         <div className="text-center mt-8">
-          <p className="text-gray-600 dark:text-gray-400 text-lg">
+          <p className="text-muted-foreground text-lg">
             Don&apos;t have an account?{" "}
             <button 
-              className="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 font-semibold hover:underline transition-colors duration-200"
+              className="text-primary hover:underline transition-colors duration-200"
               onClick={() => window.location.href = '/signup'}
             >
               Create one now
