@@ -1,4 +1,4 @@
-import { ERROR_MESSAGES, isDevelopment, isProduction } from "../constants";
+import { ERROR_MESSAGES, isDevelopment } from "../constants";
 
 export class AppError extends Error {
   constructor(

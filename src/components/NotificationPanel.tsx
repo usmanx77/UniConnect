@@ -84,7 +84,7 @@ export function NotificationPanel({ open, onOpenChange }: NotificationPanelProps
                 </div>
                 <p className="text-muted-foreground">No notifications</p>
                 <p className="text-sm text-muted-foreground mt-1">
-                  You're all caught up!
+                  You&apos;re all caught up!
                 </p>
               </div>
             ) : (

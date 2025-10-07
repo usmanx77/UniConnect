@@ -3,19 +3,16 @@ import { useApp } from "../contexts/AppContext";
 import { 
   ArrowLeft, 
   Users, 
-  Info,
   Send,
   Smile,
   Image as ImageIcon,
-  MoreVertical,
   Calendar
 } from "lucide-react";
 import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
 import { Avatar } from "./ui/avatar";
 import { Input } from "./ui/input";
 import { ScrollArea } from "./ui/scroll-area";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./ui/tabs";
+import { Tabs, TabsList, TabsTrigger } from "./ui/tabs";
 
 interface Message {
   id: string;

@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Users, TrendingUp, Check, Sparkles, Grid3x3, ChevronRight, LogIn, MessageSquare } from "lucide-react";
+import { Users, TrendingUp, Sparkles, Grid3x3, LogIn, MessageSquare } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Input } from "./ui/input";

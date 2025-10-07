@@ -3,7 +3,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
 import { Label } from "./ui/label";
-import { ImageWithFallback } from "./figma/ImageWithFallback";
 import { Image as ImageIcon, Type, X } from "lucide-react";
 import { useStories } from "../contexts/StoryContext";
 import { toast } from "sonner";

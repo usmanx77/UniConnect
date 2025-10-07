@@ -6,7 +6,6 @@ import { Calendar, TrendingUp, Users, Sparkles } from "lucide-react";
 import { Button } from "./ui/button";
 import { Card } from "./ui/card";
 import { Avatar, AvatarFallback } from "./ui/avatar";
-import { Badge } from "./ui/badge";
 import { useInfiniteScroll } from "../hooks/useInfiniteScroll";
 import { PullToRefresh } from "./PullToRefresh";
 import { Skeleton } from "./ui/skeleton";

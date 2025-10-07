@@ -8,8 +8,7 @@ import {
   Dialog, 
   DialogContent, 
   DialogHeader, 
-  DialogTitle, 
-  DialogTrigger 
+  DialogTitle 
 } from "./ui/dialog";
 import { 
   DropdownMenu, 

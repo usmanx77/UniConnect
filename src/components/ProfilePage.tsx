@@ -10,14 +10,16 @@ export function ProfilePage() {
   
   const userPosts = [
     {
-      id: 1,
+      id: "1",
+      authorId: "user-123",
       author: "You",
       department: "Computer Science",
       batch: "Fall 2023",
       timeAgo: "1d ago",
       content: "Had an amazing time at the hackathon! Our team built a sustainable campus app. Thanks to everyone who participated! 🎉",
       image: "https://images.unsplash.com/photo-1632834380561-d1e05839a33a?crop=entropy&cs=tinysrgb&fit=max&fm=jpg&ixid=M3w3Nzg4Nzd8MHwxfHNlYXJjaHwxfHx1bml2ZXJzaXR5JTIwc3R1ZGVudHMlMjBjYW1wdXN8ZW58MXx8fHwxNzU5Njk0NjMzfDA&ixlib=rb-4.1.0&q=80&w=1080&utm_source=figma&utm_medium=referral",
-      likes: 42,
+      reactions: { like: 42, love: 0, celebrate: 0, support: 0, insightful: 0 },
+      totalReactions: 42,
       comments: 15,
       liked: false,
     },

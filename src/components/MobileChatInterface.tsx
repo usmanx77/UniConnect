@@ -18,11 +18,10 @@ import { useAuth } from "../contexts/AuthContext";
 import { formatDistanceToNow } from "date-fns";
 
 interface MobileChatInterfaceProps {
-  roomId: string;
   onBack: () => void;
 }
 
-export function MobileChatInterface({ roomId, onBack }: MobileChatInterfaceProps) {
+export function MobileChatInterface({ onBack }: MobileChatInterfaceProps) {
   const { user } = useAuth();
   const {
     currentRoom,
@@ -38,11 +37,9 @@ export function MobileChatInterface({ roomId, onBack }: MobileChatInterfaceProps
   const [showEmojiPicker, setShowEmojiPicker] = useState(false);
   const [showFileUpload, setShowFileUpload] = useState(false);
   const [isKeyboardOpen, setIsKeyboardOpen] = useState(false);
-  const [inputHeight, setInputHeight] = useState(40);
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const textareaRef = useRef<HTMLTextAreaElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {

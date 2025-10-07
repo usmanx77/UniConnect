@@ -26,7 +26,7 @@ export function OnboardingPage() {
         batch,
         interests: [],
       });
-    } catch (error) {
+    } catch {
       toast.error("Failed to complete onboarding. Please try again.");
     }
   };
@@ -45,7 +45,7 @@ export function OnboardingPage() {
             </div>
             <h2 className="mb-3">Welcome to {APP_NAME}!</h2>
             <p className="text-muted-foreground mb-2">
-              You're all set, {batch}
+              You&apos;re all set, {batch}
             </p>
             <p className="text-muted-foreground mb-8">{department}</p>
             <Button onClick={handleComplete} className="w-full rounded-xl h-11" disabled={isLoading}>

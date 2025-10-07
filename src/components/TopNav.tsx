@@ -1,4 +1,4 @@
-import { Bell, Search, Menu, Moon, Sun, User } from "lucide-react";
+import { Bell, Search, Moon, Sun } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";

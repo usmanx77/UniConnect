@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Plus } from "lucide-react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
-import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
 import { StoryViewer } from "./StoryViewer";
 import { CreateStoryDialog } from "./CreateStoryDialog";

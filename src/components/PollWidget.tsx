@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { Check } from "lucide-react";
 import { Button } from "./ui/button";
-import { Progress } from "./ui/progress";
 import { motion } from "motion/react";
 import type { Poll, PollOption } from "../types";
 import { toast } from "sonner";

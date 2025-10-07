@@ -38,8 +38,9 @@ export function ReactionPicker({ onReact, currentReaction }: ReactionPickerProps
             {reactions.find((r) => r.type === currentReaction)?.icon && (
               <span style={{ color: reactions.find((r) => r.type === currentReaction)?.color }}>
                 {(() => {
-                  const Icon = reactions.find((r) => r.type === currentReaction)?.icon!;
-                  return <Icon className="h-4 w-4" />;
+                  const reaction = reactions.find((r) => r.type === currentReaction);
+                  const Icon = reaction?.icon;
+                  return Icon ? <Icon className="h-4 w-4" /> : null;
                 })()}
               </span>
             )}

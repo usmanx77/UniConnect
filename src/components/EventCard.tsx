@@ -1,6 +1,5 @@
 import { Calendar, MapPin, Users, Star, Check } from "lucide-react";
 import { Button } from "./ui/button";
-import { Badge } from "./ui/badge";
 import { motion } from "motion/react";
 import { useState } from "react";
 import type { Event, RSVPStatus } from "../types";
