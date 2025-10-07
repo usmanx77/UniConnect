@@ -158,7 +158,10 @@ export function LoginPage() {
 
         <p className="text-center text-sm text-muted-foreground mt-6">
           Don&apos;t have an account?{" "}
-          <button className="text-primary hover:underline">
+          <button 
+            className="text-primary hover:underline"
+            onClick={() => window.location.href = '/signup'}
+          >
             Sign up
           </button>
         </p>
