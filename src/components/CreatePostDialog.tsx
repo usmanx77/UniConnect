@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { X, Image, BarChart3, Smile, Loader2 } from "lucide-react";
+import { Image, BarChart3, Smile, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "./ui/dialog";
 import { Button } from "./ui/button";
 import { Textarea } from "./ui/textarea";
@@ -36,7 +36,7 @@ export function CreatePostDialog({ open, onOpenChange, onPostCreated }: CreatePo
       setPostContent("");
       onOpenChange(false);
       onPostCreated?.();
-    } catch (error) {
+    } catch {
       toast.error("Failed to create post. Please try again.");
     } finally {
       setIsSubmitting(false);

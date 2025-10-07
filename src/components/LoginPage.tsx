@@ -5,7 +5,6 @@ import { useAuth } from "../contexts/AuthContext";
 import { useToast } from "../hooks/useToast";
 import { validators } from "../lib/utils/validation";
 import { LoadingSpinner } from "./LoadingSpinner";
-import { APP_NAME } from "../lib/constants";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
@@ -22,7 +21,7 @@ export function LoginPage() {
         password: "password123",
       });
       toast.success(toast.messages.success.LOGIN_SUCCESS);
-    } catch (error) {
+    } catch {
       toast.error(toast.messages.error.AUTH_FAILED);
     }
   };
@@ -52,7 +51,7 @@ export function LoginPage() {
     try {
       await login({ email, password });
       toast.success(toast.messages.success.LOGIN_SUCCESS);
-    } catch (error) {
+    } catch {
       toast.error(toast.messages.error.INVALID_CREDENTIALS);
     }
   };
@@ -158,7 +157,7 @@ export function LoginPage() {
         </div>
 
         <p className="text-center text-sm text-muted-foreground mt-6">
-          Don't have an account?{" "}
+          Don&apos;t have an account?{" "}
           <button className="text-primary hover:underline">
             Sign up
           </button>

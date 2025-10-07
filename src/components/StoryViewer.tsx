@@ -3,8 +3,7 @@ import { motion, AnimatePresence } from "motion/react";
 import { X, ChevronLeft, ChevronRight, Pause, Play } from "lucide-react";
 import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Button } from "./ui/button";
-import { Progress } from "./ui/progress";
-import type { StoryGroup, Story } from "../types";
+import type { StoryGroup } from "../types";
 
 interface StoryViewerProps {
   storyGroups: StoryGroup[];

@@ -167,7 +167,7 @@ export function ChatNotifications({ isOpen, onClose }: ChatNotificationsProps) {
               <Bell className="h-12 w-12 mx-auto mb-4 text-muted-foreground" />
               <h3 className="text-sm font-medium mb-2">No notifications</h3>
               <p className="text-sm text-muted-foreground">
-                You're all caught up! New notifications will appear here.
+                You&apos;re all caught up! New notifications will appear here.
               </p>
             </div>
           ) : (

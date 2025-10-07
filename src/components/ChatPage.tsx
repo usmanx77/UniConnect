@@ -210,7 +210,6 @@ export function ChatPage() {
   if (isMobile && currentRoom) {
     return (
       <MobileChatInterface
-        roomId={currentRoom.id}
         onBack={() => setCurrentRoom(null)}
       />
     );

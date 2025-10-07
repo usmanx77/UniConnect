@@ -7,19 +7,16 @@ import {
   Moon, 
   Info, 
   LogOut, 
-  Mail, 
   Lock,
   Eye,
   MessageSquare,
   Users,
-  Camera,
   Globe
 } from "lucide-react";
 import { Button } from "./ui/button";
 import { Switch } from "./ui/switch";
 import { Input } from "./ui/input";
 import { Label } from "./ui/label";
-import { Separator } from "./ui/separator";
 import {
   Dialog,
   DialogContent,
@@ -42,7 +39,7 @@ import { toast } from "sonner";
 import { APP_NAME, APP_VERSION } from "../lib/constants";
 
 export function SettingsPage() {
-  const { darkMode, toggleDarkMode, navigate } = useApp();
+  const { darkMode, toggleDarkMode } = useApp();
   const { user, logout } = useAuth();
   
   // Settings state
@@ -251,7 +248,7 @@ export function SettingsPage() {
                   <div>
                     <p className="text-sm">Show Online Status</p>
                     <p className="text-xs text-muted-foreground">
-                      Let others see when you're online
+                      Let others see when you&apos;re online
                     </p>
                   </div>
                 </div>
@@ -272,7 +269,7 @@ export function SettingsPage() {
                   <div>
                     <p className="text-sm">Show Activity Status</p>
                     <p className="text-xs text-muted-foreground">
-                      Show what you're currently doing
+                      Show what you&apos;re currently doing
                     </p>
                   </div>
                 </div>

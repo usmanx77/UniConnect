@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Smile, Plus } from "lucide-react";
+import { Plus } from "lucide-react";
 import { Button } from "./ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover";
 import { EmojiPicker } from "./EmojiPicker";

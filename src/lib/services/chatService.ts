@@ -1,10 +1,4 @@
 import type { 
-  Chat, 
-  ChatMessage, 
-  User,
-  ChatRoom,
-  EnhancedMessage,
-  ChatMember,
   MessageAttachment,
   MessageReaction
 } from "../../types";
@@ -35,6 +29,53 @@ export interface SendMessageInput {
   body?: string;
   attachments?: File[];
   reply_to?: string;
+}
+
+export interface ChatRoom {
+  id: string;
+  room_type: 'direct' | 'group' | 'society';
+  name: string;
+  avatar_url?: string;
+  university_id?: string;
+  society_id?: string;
+  created_by: string;
+  last_message_at?: string;
+  created_at: string;
+  members: ChatMember[];
+  unreadCount: number;
+  isOnline: boolean;
+  is_typing: TypingUser[];
+}
+
+export interface ChatMember {
+  user_id: string;
+  name: string;
+  avatar_url?: string;
+  role: 'owner' | 'admin' | 'member';
+  is_online: boolean;
+  last_read_at?: string;
+  joined_at: string;
+}
+
+export interface EnhancedMessage {
+  id: string;
+  room_id: string;
+  author_id: string;
+  author_name: string;
+  author_avatar?: string;
+  body: string;
+  attachments: MessageAttachment[];
+  reactions: MessageReaction[];
+  reply_to?: string;
+  edited_at?: string;
+  created_at: string;
+  updated_at: string;
+  is_edited: boolean;
+  is_deleted: boolean;
+  senderId: string;
+  senderName: string;
+  content: string;
+  timestamp: string;
 }
 
 class ChatService {

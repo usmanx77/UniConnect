@@ -23,7 +23,7 @@ class PostService {
     return newPost;
   }
 
-  async getPosts(page = 1, limit = 10): Promise<Post[]> {
+  async getPosts(_page = 1, _limit = 10): Promise<Post[]> {
     await delay(600);
 
     // Mock posts data
@@ -57,17 +57,17 @@ class PostService {
     return mockPosts;
   }
 
-  async likePost(postId: string): Promise<void> {
+  async likePost(_postId: string): Promise<void> {
     await delay(300);
     // In real app, would send API request
   }
 
-  async unlikePost(postId: string): Promise<void> {
+  async unlikePost(_postId: string): Promise<void> {
     await delay(300);
     // In real app, would send API request
   }
 
-  async deletePost(postId: string): Promise<void> {
+  async deletePost(_postId: string): Promise<void> {
     await delay(500);
     // In real app, would send API request
   }
