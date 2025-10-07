@@ -9,7 +9,7 @@ export function ConnectionCard(connection: Connection) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-card rounded-2xl border border-border p-4 shadow-sm hover:shadow-md transition-all"
+      className="bg-card rounded-lg border border-border p-4 shadow-sm hover:shadow-md transition-all"
     >
       <div className="flex items-start gap-4">
         <Avatar className="w-12 h-12">

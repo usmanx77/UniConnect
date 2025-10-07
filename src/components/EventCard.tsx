@@ -11,7 +11,7 @@ export function EventCard(event: Event) {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-card rounded-2xl border border-border overflow-hidden shadow-sm hover:shadow-md transition-all"
+      className="bg-card rounded-lg border border-border overflow-hidden shadow-sm hover:shadow-md transition-all"
     >
       <div className="h-32 bg-gradient-to-br from-primary/20 to-purple-500/20 relative overflow-hidden">
         {event.image && (
