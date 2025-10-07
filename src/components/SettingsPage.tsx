@@ -38,7 +38,7 @@ import {
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { useApp } from "../contexts/AppContext";
 import { useAuth } from "../contexts/AuthContext";
-import { toast } from "sonner@2.0.3";
+import { toast } from "sonner";
 import { APP_NAME, APP_VERSION } from "../lib/constants";
 
 export function SettingsPage() {

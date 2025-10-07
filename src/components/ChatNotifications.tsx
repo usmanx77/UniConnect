@@ -235,7 +235,7 @@ export function ChatNotifications({ isOpen, onClose }: ChatNotificationsProps) {
                           </DropdownMenuTrigger>
                           <DropdownMenuContent align="end">
                             {!notification.read && (
-                              <DropdownMenuItem onClick={(e) => {
+                              <DropdownMenuItem onClick={(e: React.MouseEvent) => {
                                 e.stopPropagation();
                                 handleMarkAsRead(notification.id);
                               }}>
@@ -244,7 +244,7 @@ export function ChatNotifications({ isOpen, onClose }: ChatNotificationsProps) {
                               </DropdownMenuItem>
                             )}
                             <DropdownMenuItem 
-                              onClick={(e) => {
+                              onClick={(e: React.MouseEvent) => {
                                 e.stopPropagation();
                                 handleDeleteNotification(notification.id);
                               }}

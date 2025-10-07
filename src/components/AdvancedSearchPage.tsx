@@ -129,7 +129,7 @@ export function AdvancedSearchPage() {
                   <Label>Department</Label>
                   <Select
                     value={filters.department}
-                    onValueChange={(value) =>
+                    onValueChange={(value: string) =>
                       setFilters({ ...filters, department: value })
                     }
                   >
@@ -151,7 +151,7 @@ export function AdvancedSearchPage() {
                   <Label>Batch</Label>
                   <Select
                     value={filters.batch}
-                    onValueChange={(value) => setFilters({ ...filters, batch: value })}
+                    onValueChange={(value: string) => setFilters({ ...filters, batch: value })}
                   >
                     <SelectTrigger className="rounded-xl">
                       <SelectValue placeholder="All Batches" />
@@ -272,7 +272,7 @@ export function AdvancedSearchPage() {
             <div className="space-y-4">
               <h3>Posts</h3>
               {mockResults.posts.map((post) => (
-                <PostCard key={post.id} {...post} />
+                <PostCard key={post.id} post={post} />
               ))}
             </div>
           )}
@@ -289,9 +289,9 @@ export function AdvancedSearchPage() {
         </TabsContent>
 
         <TabsContent value="posts" className="space-y-4">
-          {mockResults.posts.map((post) => (
-            <PostCard key={post.id} {...post} />
-          ))}
+              {mockResults.posts.map((post) => (
+                <PostCard key={post.id} post={post} />
+              ))}
         </TabsContent>
 
         <TabsContent value="people" className="space-y-4">

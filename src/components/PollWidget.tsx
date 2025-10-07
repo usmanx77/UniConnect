@@ -4,7 +4,7 @@ import { Button } from "./ui/button";
 import { Progress } from "./ui/progress";
 import { motion } from "motion/react";
 import type { Poll, PollOption } from "../types";
-import { toast } from "sonner@2.0.3";
+import { toast } from "sonner";
 
 interface PollWidgetProps {
   poll: Poll;

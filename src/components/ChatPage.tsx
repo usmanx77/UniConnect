@@ -14,7 +14,10 @@ import {
   Trash2,
   Copy,
   Check,
-  X
+  X,
+  Users,
+  Bell,
+  Settings
 } from "lucide-react";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
 import { Button } from "./ui/button";
@@ -32,11 +35,11 @@ import { useAuth } from "../contexts/AuthContext";
 import { formatDistanceToNow } from "date-fns";
 import { EmojiPicker } from "./EmojiPicker";
 import { FileUpload } from "./FileUpload";
-import { MessageReactions } from "./MessageReactions";
 import { GroupChatManager } from "./GroupChatManager";
 import { ChatSettings } from "./ChatSettings";
 import { ChatNotifications } from "./ChatNotifications";
 import { MobileChatInterface } from "./MobileChatInterface";
+import { EnhancedMessage, ChatRoom } from "../types";
 
 export function ChatPage() {
   const { user } = useAuth();
@@ -46,7 +49,6 @@ export function ChatPage() {
     messages,
     typingUsers,
     isLoading,
-    error,
     searchQuery,
     searchResults,
     setCurrentRoom,
@@ -54,7 +56,6 @@ export function ChatPage() {
     editMessage,
     deleteMessage,
     addReaction,
-    removeReaction,
     startTyping,
     stopTyping,
     searchMessages,
@@ -75,7 +76,6 @@ export function ChatPage() {
 
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const inputRef = useRef<HTMLInputElement>(null);
-  const fileInputRef = useRef<HTMLInputElement>(null);
 
   // Auto-scroll to bottom when new messages arrive
   useEffect(() => {
@@ -302,7 +302,7 @@ export function ChatPage() {
                         {getRoomName(room).charAt(0)}
                       </AvatarFallback>
                     </Avatar>
-                    {room.members.some(member => member.is_online && member.user_id !== user?.id) && (
+                    {room.members.some((member: any) => member.is_online && member.user_id !== user?.id) && (
                       <span className="absolute bottom-0 right-0 w-3 h-3 bg-green-500 rounded-full border-2 border-card"></span>
                     )}
                   </div>
@@ -355,7 +355,7 @@ export function ChatPage() {
                   <p className="text-xs text-muted-foreground">
                     {typingUsers.length > 0 
                       ? `${typingUsers.map(u => u.user_name).join(', ')} typing...`
-                      : `${currentRoom.members.filter(m => m.is_online).length} online`
+                      : `${currentRoom.members.filter((m: any) => m.is_online).length} online`
                     }
                   </p>
                 </div>
@@ -472,7 +472,7 @@ export function ChatPage() {
                               {/* Attachments */}
                               {message.attachments.length > 0 && (
                                 <div className="mt-2 space-y-2">
-                                  {message.attachments.map((attachment) => (
+                                  {message.attachments.map((attachment: any) => (
                                     <div key={attachment.id} className="max-w-xs">
                                       {attachment.type === 'image' ? (
                                         <img
@@ -541,7 +541,7 @@ export function ChatPage() {
                         {/* Message Reactions */}
                         {message.reactions.length > 0 && (
                           <div className="flex flex-wrap gap-1 mt-1 ml-4">
-                            {message.reactions.map((reaction) => (
+                            {message.reactions.map((reaction: any) => (
                               <Button
                                 key={reaction.emoji}
                                 variant="outline"

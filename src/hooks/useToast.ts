@@ -1,4 +1,4 @@
-import { toast as sonnerToast } from "sonner@2.0.3";
+import { toast as sonnerToast } from "sonner";
 import { SUCCESS_MESSAGES, ERROR_MESSAGES } from "../lib/constants";
 
 export function useToast() {
