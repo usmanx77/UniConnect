@@ -1,30 +1,41 @@
-import { createClient, type SupabaseClient } from "@supabase/supabase-js";
+import { createClient } from '@supabase/supabase-js';
 
-let supabaseClient: SupabaseClient | null = null;
+const supabaseUrl = import.meta.env.VITE_SUPABASE_URL;
+const supabaseAnonKey = import.meta.env.VITE_SUPABASE_ANON_KEY;
 
-function isConfigured(): boolean {
-  const importMeta: any = (import.meta as any);
-  const url = importMeta?.env?.VITE_SUPABASE_URL || (typeof process !== "undefined" ? (process as any)?.env?.VITE_SUPABASE_URL : undefined);
-  const key = importMeta?.env?.VITE_SUPABASE_ANON_KEY || (typeof process !== "undefined" ? (process as any)?.env?.VITE_SUPABASE_ANON_KEY : undefined);
-  return Boolean(url && key);
+if (!supabaseUrl || !supabaseAnonKey) {
+  throw new Error('Missing Supabase environment variables. Please check your .env file.');
 }
 
-export function getSupabaseClient(): SupabaseClient | null {
-  if (!isConfigured()) return null;
-  if (supabaseClient) return supabaseClient;
-  const importMeta: any = (import.meta as any);
-  const url = importMeta.env.VITE_SUPABASE_URL;
-  const key = importMeta.env.VITE_SUPABASE_ANON_KEY;
-  supabaseClient = createClient(url, key, {
-    auth: {
-      persistSession: true,
-      autoRefreshToken: true,
-      detectSessionInUrl: true,
-    },
-  });
-  return supabaseClient;
-}
+export const supabase = createClient(supabaseUrl, supabaseAnonKey, {
+  auth: {
+    persistSession: true,
+    autoRefreshToken: true,
+    detectSessionInUrl: true
+  },
+  realtime: {
+    params: {
+      eventsPerSecond: 10
+    }
+  }
+});
 
-export function isSupabaseAvailable(): boolean {
-  return getSupabaseClient() !== null;
-}
+// Helper to get current user
+export const getCurrentUser = async () => {
+  const { data: { user } } = await supabase.auth.getUser();
+  return user;
+};
+
+// Helper to get current user's profile
+export const getCurrentProfile = async () => {
+  const user = await getCurrentUser();
+  if (!user) return null;
+
+  const { data } = await supabase
+    .from('profiles')
+    .select('*')
+    .eq('id', user.id)
+    .maybeSingle();
+
+  return data;
+};
