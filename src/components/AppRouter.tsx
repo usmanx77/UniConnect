@@ -1,6 +1,7 @@
 import { useAuth } from "../contexts/AuthContext";
 import { useApp } from "../contexts/AppContext";
 import { LoginPage } from "./LoginPage";
+import { SignupPage } from "./SignupPage";
 import { OnboardingPage } from "./OnboardingPage";
 import { MainLayout } from "./layouts/MainLayout";
 import { LoadingSpinner } from "./LoadingSpinner";
@@ -12,6 +13,14 @@ export function AppRouter() {
   // Show loading spinner during authentication check
   if (authLoading) {
     return <LoadingSpinner fullScreen size="lg" text="Loading..." />;
+  }
+
+  // Check if we're on the signup page
+  const isSignupPage = window.location.pathname === '/signup';
+
+  // Show signup page if on signup route
+  if (isSignupPage) {
+    return <SignupPage />;
   }
 
   // Show login page if not authenticated
