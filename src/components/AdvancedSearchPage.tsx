@@ -171,8 +171,8 @@ export function AdvancedSearchPage() {
                   <Label>Date Range</Label>
                   <Select
                     value={filters.dateRange}
-                    onValueChange={(value: any) =>
-                      setFilters({ ...filters, dateRange: value })
+                    onValueChange={(value: string) =>
+                      setFilters({ ...filters, dateRange: value as typeof filters.dateRange })
                     }
                   >
                     <SelectTrigger className="rounded-xl">

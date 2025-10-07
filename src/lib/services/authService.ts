@@ -1,16 +1,20 @@
+import type { User as SupabaseAuthUser } from "@supabase/supabase-js";
 import type { User, LoginCredentials, OnboardingData } from "../../types";
-import { API_CONFIG, ERROR_MESSAGES } from "../constants";
+import { ERROR_MESSAGES } from "../constants";
 import { getSupabaseClient, isSupabaseAvailable } from "../supabaseClient";
 
 // Mock delay to simulate API call
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
-function mapSupabaseUser(supabaseUser: any): User {
-  const name = supabaseUser?.user_metadata?.full_name || supabaseUser?.email?.split("@")[0] || "User";
+function mapSupabaseUser(supabaseUser: SupabaseAuthUser): User {
+  const email = supabaseUser.email ?? `${supabaseUser.id}@example.com`;
+  const name =
+    supabaseUser?.user_metadata?.full_name ||
+    (email ? email.split("@")[0] : "User");
   return {
     id: supabaseUser.id,
     name,
-    email: supabaseUser.email,
+    email,
     department: "",
     batch: "",
     bio: "",
@@ -21,8 +25,6 @@ function mapSupabaseUser(supabaseUser: any): User {
 }
 
 class AuthService {
-  private baseUrl = API_CONFIG.BASE_URL;
-
   async signup(credentials: LoginCredentials): Promise<{ user: User; token: string | null }> {
     if (isSupabaseAvailable()) {
       const supabase = getSupabaseClient()!;

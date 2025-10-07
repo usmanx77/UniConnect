@@ -85,7 +85,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         other.removeItem(STORAGE_KEYS.AUTH_TOKEN);
         other.removeItem(STORAGE_KEYS.USER_DATA);
         other.removeItem(STORAGE_KEYS.ONBOARDING_COMPLETE);
-      } catch {}
+      } catch (error) {
+        console.error("Failed to clear persisted auth data:", error);
+      }
       storage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
       storage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
       
@@ -118,7 +120,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         other.removeItem(STORAGE_KEYS.AUTH_TOKEN);
         other.removeItem(STORAGE_KEYS.USER_DATA);
         other.removeItem(STORAGE_KEYS.ONBOARDING_COMPLETE);
-      } catch {}
+      } catch (error) {
+        console.error("Failed to clear persisted auth data:", error);
+      }
       if (token) {
         storage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
       }
@@ -154,7 +158,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         sessionStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
         sessionStorage.removeItem(STORAGE_KEYS.USER_DATA);
         sessionStorage.removeItem(STORAGE_KEYS.ONBOARDING_COMPLETE);
-      } catch {}
+      } catch (error) {
+        console.error("Failed to clear auth storage during logout:", error);
+      }
       
       setState({
         isAuthenticated: false,

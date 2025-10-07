@@ -4,17 +4,18 @@ import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
 import { Badge } from "./ui/badge";
-import { 
-  UserPlus, 
-  Heart, 
-  MessageCircle, 
-  Calendar, 
-  Users, 
-  AtSign, 
+import {
+  UserPlus,
+  Heart,
+  MessageCircle,
+  Calendar,
+  Users,
+  AtSign,
   Award,
   X,
   CheckCheck
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { useNotifications } from "../contexts/NotificationContext";
 import type { NotificationType } from "../types";
 
@@ -23,7 +24,7 @@ interface NotificationPanelProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const notificationIcons: Record<NotificationType, any> = {
+const notificationIcons: Record<NotificationType, LucideIcon> = {
   connection_request: UserPlus,
   connection_accepted: UserPlus,
   post_reaction: Heart,
