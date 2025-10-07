@@ -149,7 +149,7 @@ export function GroupChatManager({ roomId, isOpen, onClose }: GroupChatManagerPr
                         <p className="text-xs text-muted-foreground">{user.department}</p>
                       </div>
                       {user.isOnline && (
-                        <div className="w-2 h-2 bg-green-500 rounded-full" />
+                        <div className="w-2 h-2 bg-primary rounded-full" />
                       )}
                     </div>
                   ))}
@@ -213,10 +213,10 @@ export function GroupChatManager({ roomId, isOpen, onClose }: GroupChatManagerPr
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-medium">{member.name}</p>
                         {member.role === 'admin' && (
-                          <Crown className="h-4 w-4 text-yellow-500" />
+                          <Crown className="h-4 w-4 text-primary" />
                         )}
                         {member.role === 'owner' && (
-                          <Shield className="h-4 w-4 text-blue-500" />
+                          <Shield className="h-4 w-4 text-primary" />
                         )}
                       </div>
                       <p className="text-xs text-muted-foreground">

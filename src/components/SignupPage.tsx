@@ -10,6 +10,7 @@ import { APP_NAME } from "../lib/constants";
 import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "./ui/select";
 import { PAKISTANI_UNIVERSITIES } from "../lib/constants";
 import { Checkbox } from "./ui/checkbox";
+import { authService } from "../lib/services/authService";
 
 export function SignupPage() {
   const [step, setStep] = useState(1);
@@ -27,7 +28,7 @@ export function SignupPage() {
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [agreeTerms, setAgreeTerms] = useState(false);
-  const { login } = useAuth();
+  const { signup } = useAuth();
   const toast = useToast();
 
   const handleInputChange = (field: string, value: string) => {
@@ -116,15 +117,7 @@ export function SignupPage() {
     setIsSubmitting(true);
     
     try {
-      // Simulate signup process
-      await new Promise(resolve => setTimeout(resolve, 1500));
-      
-      // Auto-login after successful signup
-      await login({
-        email: formData.email,
-        password: formData.password,
-      });
-      
+      await signup({ email: formData.email, password: formData.password });
       toast.success("Account created successfully! Welcome to UniConnect!");
     } catch {
       toast.error("Failed to create account. Please try again.");
@@ -136,12 +129,7 @@ export function SignupPage() {
   const handleGoogleSignup = async () => {
     setIsSubmitting(true);
     try {
-      // Simulate Google OAuth signup
-      await new Promise(resolve => setTimeout(resolve, 1000));
-      await login({
-        email: "student@nu.edu.pk",
-        password: "password123",
-      });
+      await authService.loginWithOAuth("google");
       toast.success("Account created successfully with Google!");
     } catch {
       toast.error("Failed to sign up with Google. Please try again.");
@@ -155,50 +143,50 @@ export function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-purple-50 via-violet-50 to-fuchsia-50 dark:from-purple-950/20 dark:via-violet-950/20 dark:to-fuchsia-950/20 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-accent/5 to-primary/10 dark:from-primary/10 dark:via-accent/10 dark:to-primary/20 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-purple-400/20 to-pink-400/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-violet-400/20 to-purple-400/20 rounded-full blur-3xl"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-accent/20 to-primary/20 rounded-full blur-3xl"></div>
       </div>
       
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-purple-500 via-violet-500 to-fuchsia-500 flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-purple-500/25 ring-4 ring-purple-100 dark:ring-purple-900/30">
+          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-primary/25 ring-4 ring-primary/10 dark:ring-primary/30">
             <span className="text-white text-3xl font-bold">U</span>
           </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent mb-3">Join {APP_NAME}</h1>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-3">Join {APP_NAME}</h1>
           <p className="text-muted-foreground text-lg">Connect with your university community</p>
         </div>
 
-        <div className="bg-card/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-purple-100/50 dark:border-purple-900/30 p-8 relative">
+        <div className="bg-card/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-border p-8 relative">
           {/* Progress indicator */}
           <div className="flex items-center gap-3 mb-8">
-            <div className={`flex-1 h-3 rounded-full transition-all duration-500 ${step >= 1 ? "bg-gradient-to-r from-purple-500 to-violet-500 shadow-lg shadow-purple-500/30" : "bg-gray-200 dark:bg-gray-700"}`}></div>
-            <div className={`flex-1 h-3 rounded-full transition-all duration-500 ${step >= 2 ? "bg-gradient-to-r from-purple-500 to-violet-500 shadow-lg shadow-purple-500/30" : "bg-gray-200 dark:bg-gray-700"}`}></div>
+            <div className={`flex-1 h-3 rounded-full transition-all duration-500 ${step >= 1 ? "bg-gradient-to-r from-primary to-accent shadow-lg shadow-primary/30" : "bg-muted"}`}></div>
+            <div className={`flex-1 h-3 rounded-full transition-all duration-500 ${step >= 2 ? "bg-gradient-to-r from-primary to-accent shadow-lg shadow-primary/30" : "bg-muted"}`}></div>
           </div>
 
           {step === 1 ? (
             <div className="space-y-6">
               <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold mb-3 bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">Personal Information</h2>
+                <h2 className="text-2xl font-bold mb-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Personal Information</h2>
                 <p className="text-muted-foreground text-lg">Tell us about yourself</p>
               </div>
 
               <div className="grid grid-cols-2 gap-4">
                 <div className="space-y-2">
-                  <label htmlFor="firstName" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">First Name</label>
+                  <label htmlFor="firstName" className="block text-sm font-semibold text-foreground">First Name</label>
                   <Input
                     id="firstName"
                     value={formData.firstName}
                     onChange={(e) => handleInputChange("firstName", e.target.value)}
                     placeholder="John"
-                    className="rounded-2xl h-12 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300"
+                    className="rounded-2xl h-12 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300"
                     aria-invalid={!!errors.firstName}
                     aria-describedby={errors.firstName ? "firstName-error" : undefined}
                   />
                   {errors.firstName && (
-                    <p id="firstName-error" className="text-sm text-red-500 mt-1 flex items-center gap-1">
+                    <p id="firstName-error" className="text-sm text-destructive mt-1 flex items-center gap-1">
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                       </svg>
@@ -207,18 +195,18 @@ export function SignupPage() {
                   )}
                 </div>
                 <div className="space-y-2">
-                  <label htmlFor="lastName" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Last Name</label>
+                  <label htmlFor="lastName" className="block text-sm font-semibold text-foreground">Last Name</label>
                   <Input
                     id="lastName"
                     value={formData.lastName}
                     onChange={(e) => handleInputChange("lastName", e.target.value)}
                     placeholder="Doe"
-                    className="rounded-2xl h-12 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300"
+                    className="rounded-2xl h-12 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300"
                     aria-invalid={!!errors.lastName}
                     aria-describedby={errors.lastName ? "lastName-error" : undefined}
                   />
                   {errors.lastName && (
-                    <p id="lastName-error" className="text-sm text-red-500 mt-1 flex items-center gap-1">
+                    <p id="lastName-error" className="text-sm text-destructive mt-1 flex items-center gap-1">
                       <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                         <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                       </svg>
@@ -229,19 +217,19 @@ export function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">University Email</label>
+                <label htmlFor="email" className="block text-sm font-semibold text-foreground">University Email</label>
                 <Input
                   id="email"
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
                   placeholder={formData.universityDomain ? `john.doe@${formData.universityDomain}` : "john.doe@your-university.edu.pk"}
-                  className="rounded-2xl h-12 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300"
+                  className="rounded-2xl h-12 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300"
                   aria-invalid={!!errors.email}
                   aria-describedby={errors.email ? "email-error" : undefined}
                 />
                 {errors.email && (
-                  <p id="email-error" className="text-sm text-red-500 mt-1 flex items-center gap-1">
+                  <p id="email-error" className="text-sm text-destructive mt-1 flex items-center gap-1">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                     </svg>
@@ -251,7 +239,7 @@ export function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Select University (Pakistan)</label>
+                <label className="block text-sm font-semibold text-foreground">Select University (Pakistan)</label>
                 <Select
                   value={formData.universityDomain || undefined}
                   onValueChange={(value) => {
@@ -268,7 +256,7 @@ export function SignupPage() {
                     if (errors.email) setErrors(prev => ({ ...prev, email: "" }));
                   }}
                 >
-                  <SelectTrigger className="rounded-2xl h-12 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300">
+                  <SelectTrigger className="rounded-2xl h-12 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300">
                     <SelectValue placeholder="Choose your university" />
                   </SelectTrigger>
                   <SelectContent>
@@ -280,7 +268,7 @@ export function SignupPage() {
                   </SelectContent>
                 </Select>
                 {errors.university && (
-                  <p id="university-error" className="text-sm text-red-500 mt-1 flex items-center gap-1">
+                  <p id="university-error" className="text-sm text-destructive mt-1 flex items-center gap-1">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                     </svg>
@@ -301,12 +289,12 @@ export function SignupPage() {
           ) : (
             <form onSubmit={handleSubmit} className="space-y-6">
               <div className="text-center mb-8">
-                <h2 className="text-2xl font-bold mb-3 bg-gradient-to-r from-purple-600 to-violet-600 bg-clip-text text-transparent">Create Password</h2>
+                <h2 className="text-2xl font-bold mb-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Create Password</h2>
                 <p className="text-muted-foreground text-lg">Choose a secure password</p>
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Password</label>
+                <label htmlFor="password" className="block text-sm font-semibold text-foreground">Password</label>
                 <div className="relative">
                   <Input
                     id="password"
@@ -314,47 +302,47 @@ export function SignupPage() {
                     value={formData.password}
                     onChange={(e) => handleInputChange("password", e.target.value)}
                     placeholder="••••••••"
-                    className="rounded-2xl h-12 pr-12 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300"
+                    className="rounded-2xl h-12 pr-12 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300"
                     aria-invalid={!!errors.password}
                     aria-describedby={errors.password ? "password-error" : undefined}
                   />
                   <button
                     type="button"
                     onClick={() => setShowPassword(!showPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200"
                   >
                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
                 {errors.password && (
-                  <p id="password-error" className="text-sm text-red-500 mt-2 flex items-center gap-1">
+                  <p id="password-error" className="text-sm text-destructive mt-2 flex items-center gap-1">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                     </svg>
                     {errors.password}
                   </p>
                 )}
-                <div className="mt-4 p-4 bg-gray-50 dark:bg-gray-800/50 rounded-2xl space-y-2">
-                  <p className="text-sm font-medium text-gray-700 dark:text-gray-300 mb-3">Password requirements:</p>
+                <div className="mt-4 p-4 bg-muted rounded-2xl space-y-2">
+                  <p className="text-sm font-medium text-foreground mb-3">Password requirements:</p>
                   <div className="space-y-2">
                     <div className="flex items-center gap-3 text-sm">
-                      <CheckCircle2 className={`w-4 h-4 ${formData.password.length >= 8 ? "text-green-500" : "text-gray-400"}`} />
-                      <span className={formData.password.length >= 8 ? "text-green-600 dark:text-green-400" : "text-gray-500"}>At least 8 characters</span>
+                      <CheckCircle2 className={`w-4 h-4 ${formData.password.length >= 8 ? "text-primary" : "text-muted-foreground"}`} />
+                      <span className={formData.password.length >= 8 ? "text-primary" : "text-muted-foreground"}>At least 8 characters</span>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
-                      <CheckCircle2 className={`w-4 h-4 ${/[A-Z]/.test(formData.password) ? "text-green-500" : "text-gray-400"}`} />
-                      <span className={/[A-Z]/.test(formData.password) ? "text-green-600 dark:text-green-400" : "text-gray-500"}>One uppercase letter</span>
+                      <CheckCircle2 className={`w-4 h-4 ${/[A-Z]/.test(formData.password) ? "text-primary" : "text-muted-foreground"}`} />
+                      <span className={/[A-Z]/.test(formData.password) ? "text-primary" : "text-muted-foreground"}>One uppercase letter</span>
                     </div>
                     <div className="flex items-center gap-3 text-sm">
-                      <CheckCircle2 className={`w-4 h-4 ${/[0-9]/.test(formData.password) ? "text-green-500" : "text-gray-400"}`} />
-                      <span className={/[0-9]/.test(formData.password) ? "text-green-600 dark:text-green-400" : "text-gray-500"}>One number</span>
+                      <CheckCircle2 className={`w-4 h-4 ${/[0-9]/.test(formData.password) ? "text-primary" : "text-muted-foreground"}`} />
+                      <span className={/[0-9]/.test(formData.password) ? "text-primary" : "text-muted-foreground"}>One number</span>
                     </div>
                   </div>
                 </div>
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="confirmPassword" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Confirm Password</label>
+                <label htmlFor="confirmPassword" className="block text-sm font-semibold text-foreground">Confirm Password</label>
                 <div className="relative">
                   <Input
                     id="confirmPassword"
@@ -362,20 +350,20 @@ export function SignupPage() {
                     value={formData.confirmPassword}
                     onChange={(e) => handleInputChange("confirmPassword", e.target.value)}
                     placeholder="••••••••"
-                    className="rounded-2xl h-12 pr-12 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300"
+                    className="rounded-2xl h-12 pr-12 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300"
                     aria-invalid={!!errors.confirmPassword}
                     aria-describedby={errors.confirmPassword ? "confirmPassword-error" : undefined}
                   />
                   <button
                     type="button"
                     onClick={() => setShowConfirmPassword(!showConfirmPassword)}
-                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors duration-200"
+                    className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground transition-colors duration-200"
                   >
                     {showConfirmPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                   </button>
                 </div>
                 {errors.confirmPassword && (
-                  <p id="confirmPassword-error" className="text-sm text-red-500 mt-2 flex items-center gap-1">
+                  <p id="confirmPassword-error" className="text-sm text-destructive mt-2 flex items-center gap-1">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
                       <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
                     </svg>
@@ -389,14 +377,14 @@ export function SignupPage() {
                   type="button"
                   onClick={handleBack}
                   variant="outline"
-                  className="flex-1 rounded-2xl h-14 border-2 border-gray-200 hover:border-purple-300 hover:bg-purple-50 dark:hover:bg-purple-950/20 font-semibold"
+                  className="flex-1 rounded-2xl h-14 border-2 border-border hover:border-primary hover:bg-accent font-semibold"
                 >
                   <ArrowLeft className="w-5 h-5 mr-2" />
                   Back
                 </Button>
                 <Button
                   type="submit"
-                  className="flex-1 rounded-2xl h-14 bg-gradient-to-r from-purple-600 to-violet-600 hover:from-purple-700 hover:to-violet-700 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+                  className="flex-1 rounded-2xl h-14 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
                   disabled={!formData.password || !formData.confirmPassword}
                 >
                   {isSubmitting ? (
@@ -416,12 +404,12 @@ export function SignupPage() {
                   onCheckedChange={(checked) => setAgreeTerms(Boolean(checked))}
                   className="mt-1"
                 />
-                <label htmlFor="terms" className="text-sm text-gray-700 dark:text-gray-300">
-                  I agree to the <a className="text-purple-600 hover:underline" href="#">Terms of Service</a> and <a className="text-purple-600 hover:underline" href="#">Privacy Policy</a>.
+                <label htmlFor="terms" className="text-sm text-foreground">
+                  I agree to the <a className="text-primary hover:underline" href="#">Terms of Service</a> and <a className="text-primary hover:underline" href="#">Privacy Policy</a>.
                 </label>
               </div>
               {errors.terms && (
-                <p className="text-sm text-red-500 -mt-1">{errors.terms}</p>
+                <p className="text-sm text-destructive -mt-1">{errors.terms}</p>
               )}
 
             </form>
@@ -439,7 +427,7 @@ export function SignupPage() {
               </div>
 
               <Button
-                className="w-full rounded-2xl mb-6 h-14 shadow-lg hover:shadow-xl transition-all duration-300 bg-white hover:bg-gray-50 text-gray-700 border-2 border-gray-200 hover:border-purple-300 font-semibold"
+                className="w-full rounded-2xl mb-6 h-14 shadow-lg hover:shadow-xl transition-all duration-300 bg-card hover:bg-accent text-foreground border-2 border-border hover:border-primary/40 font-semibold"
                 onClick={handleGoogleSignup}
                 disabled={isSubmitting}
                 variant="outline"
@@ -468,10 +456,10 @@ export function SignupPage() {
           )}
 
           <div className="text-center mt-8">
-            <p className="text-gray-600 dark:text-gray-400 text-lg">
+            <p className="text-muted-foreground text-lg">
               Already have an account?{" "}
               <button 
-                className="text-purple-600 hover:text-purple-700 dark:text-purple-400 dark:hover:text-purple-300 font-semibold hover:underline transition-colors duration-200"
+                className="text-primary hover:underline transition-colors duration-200"
                 onClick={() => window.history.back()}
               >
                 Sign in

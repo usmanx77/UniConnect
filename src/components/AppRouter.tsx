@@ -16,7 +16,7 @@ export function AppRouter() {
   }
 
   // Check if we're on the signup page
-  const isSignupPage = window.location.pathname === '/signup';
+  const isSignupPage = typeof window !== 'undefined' && window.location.pathname === '/signup';
 
   // Show signup page if on signup route
   if (isSignupPage) {
