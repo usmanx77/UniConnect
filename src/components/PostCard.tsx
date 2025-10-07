@@ -6,7 +6,7 @@ import { ReactionPicker } from "./ReactionPicker";
 import { ImageLightbox } from "./ImageLightbox";
 import { PollWidget } from "./PollWidget";
 import { motion } from "motion/react";
-import { toast } from "sonner@2.0.3";
+import { toast } from "sonner";
 import type { Post, ReactionType } from "../types";
 
 export function PostCard({ post }: { 

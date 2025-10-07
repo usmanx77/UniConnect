@@ -63,7 +63,7 @@ export function BookmarksPage() {
 
         <TabsContent value="posts" className="space-y-4">
           {bookmarkedPosts.length > 0 ? (
-            bookmarkedPosts.map((post) => <PostCard key={post.id} {...post} />)
+            bookmarkedPosts.map((post) => <PostCard key={post.id} post={post} />)
           ) : (
             <div className="bg-card rounded-2xl border border-border p-12 text-center">
               <Bookmark className="h-12 w-12 text-muted-foreground mx-auto mb-4" />

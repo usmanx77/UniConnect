@@ -281,3 +281,87 @@ export interface OnboardingData {
   batch: string;
   interests: string[];
 }
+
+// Additional Types for missing definitions
+export interface ChatMember {
+  user_id: string;
+  name: string;
+  avatar_url?: string;
+  role: 'member' | 'admin' | 'owner';
+  last_read_at: string;
+  joined_at: string;
+  is_online: boolean;
+}
+
+export interface MessageAttachment {
+  id: string;
+  name: string;
+  type: string;
+  url: string;
+  size: number;
+}
+
+export interface MessageReaction {
+  id: string;
+  user_id: string;
+  user_name: string;
+  emoji: string;
+  created_at: string;
+}
+
+export interface EnhancedMessage {
+  id: string;
+  room_id: string;
+  author_id: string;
+  author_name: string;
+  author_avatar?: string;
+  body?: string;
+  attachments: MessageAttachment[];
+  reactions: MessageReaction[];
+  reply_to?: string;
+  edited_at?: string;
+  created_at: string;
+  updated_at: string;
+  is_edited: boolean;
+  is_deleted: boolean;
+  senderId: string;
+  senderName: string;
+  content: string;
+  timestamp: string;
+  read: boolean;
+  type?: "text" | "image" | "file";
+  attachmentUrl?: string;
+}
+
+export interface ChatRoom {
+  id: string;
+  room_type: 'dm' | 'group' | 'society';
+  name?: string;
+  avatar_url?: string;
+  university_id: string;
+  society_id?: string;
+  created_by: string;
+  last_message_at: string;
+  created_at: string;
+  members: ChatMember[];
+  unread_count: number;
+  is_typing: string[];
+  unreadCount: number;
+  isOnline: boolean;
+  lastMessage?: ChatMessage;
+}
+
+export interface Users {
+  id: string;
+  name: string;
+  avatar?: string;
+}
+
+// Icon components (these will be imported from lucide-react)
+export interface IconProps {
+  className?: string;
+  size?: number;
+}
+
+// Re-export commonly used types
+export type { User };

@@ -1,7 +1,12 @@
 import type { 
   Chat, 
   ChatMessage, 
-  User 
+  User,
+  ChatRoom,
+  EnhancedMessage,
+  ChatMember,
+  MessageAttachment,
+  MessageReaction
 } from "../../types";
 import { createClient } from '@supabase/supabase-js';
 
@@ -10,62 +15,7 @@ const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.s
 const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
 const supabase = createClient(supabaseUrl, supabaseKey);
 
-// Enhanced Chat Types
-export interface ChatRoom {
-  id: string;
-  room_type: 'dm' | 'group' | 'society';
-  name?: string;
-  avatar_url?: string;
-  university_id: string;
-  society_id?: string;
-  created_by: string;
-  last_message_at: string;
-  created_at: string;
-  members: ChatMember[];
-  unread_count: number;
-  is_typing: string[];
-}
-
-export interface ChatMember {
-  user_id: string;
-  name: string;
-  avatar_url?: string;
-  role: 'member' | 'admin';
-  last_read_at: string;
-  joined_at: string;
-  is_online: boolean;
-}
-
-export interface EnhancedMessage {
-  id: string;
-  room_id: string;
-  author_id: string;
-  author_name: string;
-  author_avatar?: string;
-  body?: string;
-  attachments: MessageAttachment[];
-  reactions: MessageReaction[];
-  reply_to?: string;
-  edited_at?: string;
-  created_at: string;
-  is_edited: boolean;
-  is_deleted: boolean;
-}
-
-export interface MessageAttachment {
-  id: string;
-  type: 'image' | 'video' | 'file' | 'audio';
-  url: string;
-  filename: string;
-  size: number;
-  metadata?: Record<string, any>;
-}
-
-export interface MessageReaction {
-  emoji: string;
-  users: string[];
-  count: number;
-}
+// Enhanced Chat Types - using types from main types file
 
 export interface TypingUser {
   user_id: string;
