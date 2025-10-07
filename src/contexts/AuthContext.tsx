@@ -21,13 +21,33 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     error: null,
   });
 
+  const getFromStorages = (key: string): string | null => {
+    try {
+      const fromSession = typeof window !== 'undefined' ? sessionStorage.getItem(key) : null;
+      if (fromSession) return fromSession;
+      return typeof window !== 'undefined' ? localStorage.getItem(key) : null;
+    } catch {
+      return null;
+    }
+  };
+
+  const getActiveStorage = (): Storage => {
+    try {
+      if (typeof window === 'undefined') return localStorage;
+      const hasSessionToken = !!sessionStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
+      return hasSessionToken ? sessionStorage : localStorage;
+    } catch {
+      return localStorage;
+    }
+  };
+
   // Initialize auth state from storage
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const token = localStorage.getItem(STORAGE_KEYS.AUTH_TOKEN);
-        const userData = localStorage.getItem(STORAGE_KEYS.USER_DATA);
-        const onboardingComplete = localStorage.getItem(STORAGE_KEYS.ONBOARDING_COMPLETE);
+        const token = getFromStorages(STORAGE_KEYS.AUTH_TOKEN);
+        const userData = getFromStorages(STORAGE_KEYS.USER_DATA);
+        const onboardingComplete = getFromStorages(STORAGE_KEYS.ONBOARDING_COMPLETE);
 
         if (token && userData) {
           const user = JSON.parse(userData);
@@ -55,9 +75,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     try {
       const { user, token } = await authService.login(credentials);
-      
-      localStorage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
-      localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
+      // Decide persistence based on saved preference
+      const persistPref = (typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEYS.AUTH_PERSIST) : null) || 'local';
+      const storage: Storage = persistPref === 'session' ? sessionStorage : localStorage;
+      // Clear from the other storage to avoid stale data
+      try {
+        const other = persistPref === 'session' ? localStorage : sessionStorage;
+        other.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+        other.removeItem(STORAGE_KEYS.USER_DATA);
+        other.removeItem(STORAGE_KEYS.ONBOARDING_COMPLETE);
+      } catch {}
+      storage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+      storage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
       
       setState({
         isAuthenticated: true,
@@ -82,9 +111,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       await authService.logout();
       
-      localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
-      localStorage.removeItem(STORAGE_KEYS.USER_DATA);
-      localStorage.removeItem(STORAGE_KEYS.ONBOARDING_COMPLETE);
+      try {
+        localStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+        localStorage.removeItem(STORAGE_KEYS.USER_DATA);
+        localStorage.removeItem(STORAGE_KEYS.ONBOARDING_COMPLETE);
+        sessionStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+        sessionStorage.removeItem(STORAGE_KEYS.USER_DATA);
+        sessionStorage.removeItem(STORAGE_KEYS.ONBOARDING_COMPLETE);
+      } catch {}
       
       setState({
         isAuthenticated: false,
@@ -104,9 +138,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     try {
       const updatedUser = await authService.completeOnboarding(data);
-      
-      localStorage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETE, "true");
-      localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(updatedUser));
+      const storage = getActiveStorage();
+      storage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETE, "true");
+      storage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(updatedUser));
       
       setState(prev => ({
         ...prev,
@@ -128,7 +162,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     if (!state.user) return;
     
     const updatedUser = { ...state.user, ...updates };
-    localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(updatedUser));
+    const storage = getActiveStorage();
+    storage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(updatedUser));
     setState(prev => ({ ...prev, user: updatedUser }));
   };
 

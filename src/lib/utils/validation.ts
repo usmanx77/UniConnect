@@ -3,7 +3,8 @@ import { VALIDATION } from "../constants";
 export const validators = {
   email: (email: string): boolean => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    return emailRegex.test(email) && email.endsWith(".edu");
+    // Restrict to Pakistani university domains ending with .edu.pk
+    return emailRegex.test(email) && /\.edu\.pk$/i.test(email.split("@")[1] || "");
   },
 
   password: (password: string): { valid: boolean; message?: string } => {

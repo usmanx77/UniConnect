@@ -7,6 +7,9 @@ import { validators } from "../lib/utils/validation";
 import { LoadingSpinner } from "./LoadingSpinner";
 import { ArrowLeft, Eye, EyeOff, CheckCircle2 } from "lucide-react";
 import { APP_NAME } from "../lib/constants";
+import { Select, SelectTrigger, SelectContent, SelectItem, SelectValue } from "./ui/select";
+import { PAKISTANI_UNIVERSITIES } from "../lib/constants";
+import { Checkbox } from "./ui/checkbox";
 
 export function SignupPage() {
   const [step, setStep] = useState(1);
@@ -17,11 +20,13 @@ export function SignupPage() {
     password: "",
     confirmPassword: "",
     university: "",
+    universityDomain: "",
   });
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [agreeTerms, setAgreeTerms] = useState(false);
   const { login } = useAuth();
   const toast = useToast();
 
@@ -47,11 +52,22 @@ export function SignupPage() {
     if (!formData.email.trim()) {
       newErrors.email = "Email is required";
     } else if (!validators.email(formData.email)) {
-      newErrors.email = "Please enter a valid university email (.edu)";
+      newErrors.email = "Please enter a valid university email (.edu.pk)";
     }
     
     if (!formData.university.trim()) {
-      newErrors.university = "University name is required";
+      newErrors.university = "University is required";
+    }
+    if (!formData.universityDomain.trim()) {
+      newErrors.university = "Please select your university";
+    }
+
+    // If a university domain is selected, ensure email matches it
+    if (formData.universityDomain && formData.email) {
+      const emailDomain = (formData.email.split("@")[1] || "").toLowerCase();
+      if (!emailDomain.endsWith(formData.universityDomain.toLowerCase())) {
+        newErrors.email = `Please use your ${formData.universityDomain} email`;
+      }
     }
     
     setErrors(newErrors);
@@ -92,6 +108,10 @@ export function SignupPage() {
     e.preventDefault();
     
     if (!validateStep2()) return;
+    if (!agreeTerms) {
+      setErrors(prev => ({ ...prev, terms: "You must agree to the Terms to continue" }));
+      return;
+    }
     
     setIsSubmitting(true);
     
@@ -119,7 +139,7 @@ export function SignupPage() {
       // Simulate Google OAuth signup
       await new Promise(resolve => setTimeout(resolve, 1000));
       await login({
-        email: "student@university.edu",
+        email: "student@nu.edu.pk",
         password: "password123",
       });
       toast.success("Account created successfully with Google!");
@@ -215,7 +235,7 @@ export function SignupPage() {
                   type="email"
                   value={formData.email}
                   onChange={(e) => handleInputChange("email", e.target.value)}
-                  placeholder="john.doe@university.edu"
+                  placeholder={formData.universityDomain ? `john.doe@${formData.universityDomain}` : "john.doe@your-university.edu.pk"}
                   className="rounded-2xl h-12 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300"
                   aria-invalid={!!errors.email}
                   aria-describedby={errors.email ? "email-error" : undefined}
@@ -231,16 +251,34 @@ export function SignupPage() {
               </div>
 
               <div className="space-y-2">
-                <label htmlFor="university" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">University Name</label>
-                <Input
-                  id="university"
-                  value={formData.university}
-                  onChange={(e) => handleInputChange("university", e.target.value)}
-                  placeholder="University of Technology"
-                  className="rounded-2xl h-12 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300"
-                  aria-invalid={!!errors.university}
-                  aria-describedby={errors.university ? "university-error" : undefined}
-                />
+                <label className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Select University (Pakistan)</label>
+                <Select
+                  value={formData.universityDomain || undefined}
+                  onValueChange={(value) => {
+                    const selected = PAKISTANI_UNIVERSITIES.find(u => u.domain === value);
+                    setFormData(prev => ({
+                      ...prev,
+                      university: selected?.name || "",
+                      universityDomain: value,
+                      email: prev.email && prev.email.includes("@")
+                        ? prev.email.split("@")[0] + "@" + value
+                        : prev.email,
+                    }));
+                    if (errors.university) setErrors(prev => ({ ...prev, university: "" }));
+                    if (errors.email) setErrors(prev => ({ ...prev, email: "" }));
+                  }}
+                >
+                  <SelectTrigger className="rounded-2xl h-12 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300">
+                    <SelectValue placeholder="Choose your university" />
+                  </SelectTrigger>
+                  <SelectContent>
+                    {PAKISTANI_UNIVERSITIES.map(u => (
+                      <SelectItem key={u.domain} value={u.domain}>
+                        {u.name} ({u.domain})
+                      </SelectItem>
+                    ))}
+                  </SelectContent>
+                </Select>
                 {errors.university && (
                   <p id="university-error" className="text-sm text-red-500 mt-1 flex items-center gap-1">
                     <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -249,6 +287,7 @@ export function SignupPage() {
                     {errors.university}
                   </p>
                 )}
+                <p className="text-xs text-muted-foreground">Only official .edu.pk emails are accepted.</p>
               </div>
 
               <Button
@@ -370,6 +409,21 @@ export function SignupPage() {
                   )}
                 </Button>
               </div>
+              <div className="flex items-start gap-3 -mt-2">
+                <Checkbox
+                  id="terms"
+                  checked={agreeTerms}
+                  onCheckedChange={(checked) => setAgreeTerms(Boolean(checked))}
+                  className="mt-1"
+                />
+                <label htmlFor="terms" className="text-sm text-gray-700 dark:text-gray-300">
+                  I agree to the <a className="text-purple-600 hover:underline" href="#">Terms of Service</a> and <a className="text-purple-600 hover:underline" href="#">Privacy Policy</a>.
+                </label>
+              </div>
+              {errors.terms && (
+                <p className="text-sm text-red-500 -mt-1">{errors.terms}</p>
+              )}
+
             </form>
           )}
 

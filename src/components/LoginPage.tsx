@@ -5,6 +5,10 @@ import { useAuth } from "../contexts/AuthContext";
 import { useToast } from "../hooks/useToast";
 import { validators } from "../lib/utils/validation";
 import { LoadingSpinner } from "./LoadingSpinner";
+import { Eye, EyeOff } from "lucide-react";
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from "./ui/dialog";
+import { STORAGE_KEYS } from "../lib/constants";
+import { authService } from "../lib/services/authService";
 
 export function LoginPage() {
   const [email, setEmail] = useState("");
@@ -12,12 +16,18 @@ export function LoginPage() {
   const [errors, setErrors] = useState({ email: "", password: "" });
   const { login, isLoading } = useAuth();
   const toast = useToast();
+  const [showPassword, setShowPassword] = useState(false);
+  const [rememberMe, setRememberMe] = useState(true);
+  const [forgotOpen, setForgotOpen] = useState(false);
+  const [resetEmail, setResetEmail] = useState("");
+  const [resetError, setResetError] = useState("");
+  const [resetSent, setResetSent] = useState(false);
 
   const handleGoogleLogin = async () => {
     try {
       // Simulate Google OAuth
       await login({
-        email: "student@university.edu",
+        email: "student@nu.edu.pk",
         password: "password123",
       });
       toast.success(toast.messages.success.LOGIN_SUCCESS);
@@ -33,7 +43,7 @@ export function LoginPage() {
     const newErrors = { email: "", password: "" };
     
     if (!validators.email(email)) {
-      newErrors.email = "Please enter a valid university email (.edu)";
+      newErrors.email = "Please enter a valid university email (.edu.pk)";
     }
     
     const passwordValidation = validators.password(password);
@@ -47,6 +57,10 @@ export function LoginPage() {
     }
     
     setErrors({ email: "", password: "" });
+    // Persist preference for session vs local storage
+    try {
+      localStorage.setItem(STORAGE_KEYS.AUTH_PERSIST, rememberMe ? "local" : "session");
+    } catch {}
     
     try {
       await login({ email, password });
@@ -120,7 +134,7 @@ export function LoginPage() {
                 type="email"
                 value={email}
                 onChange={(e) => setEmail(e.target.value)}
-                placeholder="yourname@university.edu"
+                placeholder="yourname@your-university.edu.pk"
                 className="rounded-2xl h-14 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300 text-lg px-4"
                 required
                 aria-invalid={!!errors.email}
@@ -137,17 +151,26 @@ export function LoginPage() {
             </div>
             <div className="space-y-2">
               <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300">Password</label>
-              <Input
-                id="password"
-                type="password"
-                value={password}
-                onChange={(e) => setPassword(e.target.value)}
-                placeholder="••••••••"
-                className="rounded-2xl h-14 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300 text-lg px-4"
-                required
-                aria-invalid={!!errors.password}
-                aria-describedby={errors.password ? "password-error" : undefined}
-              />
+              <div className="relative">
+                <Input
+                  id="password"
+                  type={showPassword ? "text" : "password"}
+                  value={password}
+                  onChange={(e) => setPassword(e.target.value)}
+                  placeholder="••••••••"
+                  className="rounded-2xl h-14 border-2 border-gray-200 focus:border-purple-500 focus:ring-purple-500/20 transition-all duration-300 text-lg px-4 pr-12"
+                  required
+                  aria-invalid={!!errors.password}
+                  aria-describedby={errors.password ? "password-error" : undefined}
+                />
+                <button
+                  type="button"
+                  onClick={() => setShowPassword(!showPassword)}
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                >
+                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
+                </button>
+              </div>
               {errors.password && (
                 <p id="password-error" className="text-sm text-red-500 mt-2 flex items-center gap-1">
                   <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
@@ -156,6 +179,62 @@ export function LoginPage() {
                   {errors.password}
                 </p>
               )}
+            </div>
+            <div className="flex items-center justify-between">
+              <label className="flex items-center gap-3 text-sm text-gray-600 dark:text-gray-300">
+                <input
+                  type="checkbox"
+                  className="h-4 w-4 rounded border-gray-300 text-purple-600 focus:ring-purple-500"
+                  checked={rememberMe}
+                  onChange={(e) => setRememberMe(e.target.checked)}
+                />
+                Remember me on this device
+              </label>
+              <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
+                <DialogTrigger asChild>
+                  <button type="button" className="text-sm text-purple-600 hover:text-purple-700 font-semibold">Forgot password?</button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Reset your password</DialogTitle>
+                    <DialogDescription>Enter your .edu.pk email and we will send reset instructions.</DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-3">
+                    <Input
+                      type="email"
+                      placeholder="yourname@your-university.edu.pk"
+                      value={resetEmail}
+                      onChange={(e) => {
+                        setResetEmail(e.target.value);
+                        setResetError("");
+                        setResetSent(false);
+                      }}
+                    />
+                    {resetError && <p className="text-sm text-red-500">{resetError}</p>}
+                    {resetSent && <p className="text-sm text-green-600">If an account exists, a reset email was sent.</p>}
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      type="button"
+                      onClick={async () => {
+                        if (!validators.email(resetEmail)) {
+                          setResetError("Please enter a valid .edu.pk email");
+                          return;
+                        }
+                        try {
+                          await authService.requestPasswordReset(resetEmail);
+                          setResetSent(true);
+                          setResetError("");
+                        } catch {
+                          setResetError("Failed to send reset email");
+                        }
+                      }}
+                    >
+                      Send reset link
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
             </div>
             <Button
               type="submit"
@@ -175,7 +254,7 @@ export function LoginPage() {
 
           <div className="text-center mt-8 p-4 bg-purple-50 dark:bg-purple-950/20 rounded-2xl border border-purple-100 dark:border-purple-900/30">
             <p className="text-sm text-purple-700 dark:text-purple-300 font-medium">
-              🔒 Only @university.edu emails are allowed
+              🔒 Only official .edu.pk university emails are allowed
             </p>
           </div>
         </div>

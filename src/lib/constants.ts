@@ -19,6 +19,7 @@ export const STORAGE_KEYS = {
   USER_DATA: "uniconnect_user_data",
   DARK_MODE: "uniconnect_dark_mode",
   ONBOARDING_COMPLETE: "uniconnect_onboarding_complete",
+  AUTH_PERSIST: "uniconnect_auth_persist", // 'local' | 'session'
 } as const;
 
 // Routes Configuration
@@ -113,3 +114,23 @@ export const SUCCESS_MESSAGES = {
   SOCIETY_JOINED: "Successfully joined society!",
   EVENT_RSVP: "RSVP confirmed!",
 } as const;
+
+// Pakistani Universities (sample list)
+export const PAKISTANI_UNIVERSITIES: ReadonlyArray<{ name: string; domain: string }> = [
+  { name: "National University of Sciences & Technology (NUST)", domain: "nust.edu.pk" },
+  { name: "FAST National University (NUCES)", domain: "nu.edu.pk" },
+  { name: "Lahore University of Management Sciences (LUMS)", domain: "lums.edu.pk" },
+  { name: "University of the Punjab", domain: "pu.edu.pk" },
+  { name: "UET Lahore", domain: "uet.edu.pk" },
+  { name: "COMSATS University Islamabad", domain: "comsats.edu.pk" },
+  { name: "Quaid-i-Azam University", domain: "qau.edu.pk" },
+  { name: "University of Karachi", domain: "uok.edu.pk" },
+  { name: "IBA Karachi", domain: "iba.edu.pk" },
+  { name: "Government College University Lahore", domain: "gcu.edu.pk" },
+  { name: "NED University of Engineering & Technology", domain: "neduet.edu.pk" },
+  { name: "GIKI", domain: "giki.edu.pk" },
+  { name: "Air University", domain: "au.edu.pk" },
+  { name: "Bahria University", domain: "bahria.edu.pk" },
+  { name: "UET Peshawar", domain: "uetpeshawar.edu.pk" },
+  { name: "UET Taxila", domain: "uettaxila.edu.pk" },
+];
