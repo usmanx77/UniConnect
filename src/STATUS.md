@@ -135,7 +135,7 @@ ErrorBoundary
 ## 🚀 Features Status
 
 ### Authentication Flow
-1. ✅ Login page with Google OAuth placeholder
+1. ✅ Login page with immersive email-based sign-in
 2. ✅ Email validation (university domain)
 3. ✅ Onboarding flow (department, batch, interests)
 4. ✅ Persistent session

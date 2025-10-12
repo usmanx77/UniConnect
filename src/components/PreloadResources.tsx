@@ -13,6 +13,8 @@ export function PreloadResources() {
       document.head.appendChild(link);
     };
 
+    preloadFont('https://fonts.gstatic.com/s/pacifico/v22/FwZY7-Qmy14u9lezJ96A4sijpFu_.woff2');
+
     // Preload critical images
     const preloadImage = (src: string) => {
       const link = document.createElement('link');

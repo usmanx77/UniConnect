@@ -10,16 +10,16 @@ export const isProduction = typeof process !== 'undefined'
   : import.meta.env?.PROD ?? false;
 
 // App Configuration
-export const APP_NAME = "UniConnect";
+export const APP_NAME = "CampusLoif";
 export const APP_VERSION = "1.0.0";
 
 // Storage Keys
 export const STORAGE_KEYS = {
-  AUTH_TOKEN: "uniconnect_auth_token",
-  USER_DATA: "uniconnect_user_data",
-  DARK_MODE: "uniconnect_dark_mode",
-  ONBOARDING_COMPLETE: "uniconnect_onboarding_complete",
-  AUTH_PERSIST: "uniconnect_auth_persist", // 'local' | 'session'
+  AUTH_TOKEN: "campusloif_auth_token",
+  USER_DATA: "campusloif_user_data",
+  DARK_MODE: "campusloif_dark_mode",
+  ONBOARDING_COMPLETE: "campusloif_onboarding_complete",
+  AUTH_PERSIST: "campusloif_auth_persist", // 'local' | 'session'
 } as const;
 
 // Routes Configuration
@@ -70,7 +70,7 @@ export const SOCIETY_CATEGORIES = [
 
 // API Configuration (mock)
 export const API_CONFIG = {
-  BASE_URL: "https://api.uniconnect.edu",
+  BASE_URL: "https://api.campusloif.com",
   TIMEOUT: 30000,
   RETRY_ATTEMPTS: 3,
 } as const;

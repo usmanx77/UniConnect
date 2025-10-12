@@ -16,7 +16,7 @@ interface TopNavProps {
   onSearchClick?: () => void;
 }
 
-export function TopNav({ title = "UniConnect", showSearch = false, darkMode, onToggleDarkMode, onSearchClick }: TopNavProps) {
+export function TopNav({ title = "CampusLoif", showSearch = false, darkMode, onToggleDarkMode, onSearchClick }: TopNavProps) {
   const [notificationOpen, setNotificationOpen] = useState(false);
   const { unreadCount } = useNotifications();
   const { navigate } = useApp();

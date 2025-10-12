@@ -44,9 +44,9 @@
         },
         includeAssets: ['favicon.ico', 'apple-touch-icon.png', 'masked-icon.svg'],
         manifest: {
-          name: 'UniConnect - University Social Network',
-          short_name: 'UniConnect',
-          description: 'Connect with university students and build meaningful relationships',
+          name: 'CampusLoif - University Social Lounge',
+          short_name: 'CampusLoif',
+          description: 'Connect with your campus, societies, and circles in a refined digital lounge',
           theme_color: '#8b5cf6',
           background_color: '#f8f9fb',
           display: 'standalone',

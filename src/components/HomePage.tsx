@@ -172,15 +172,12 @@ export function HomePage({ onOpenCreatePost }: HomePageProps) {
       <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-24 md:pb-12">
         <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
           <div className="space-y-2">
-            <p className="text-xs font-medium uppercase tracking-[0.4em] text-muted-foreground/70">
-              UniConnect
-            </p>
+            <p className="text-xs font-medium uppercase tracking-[0.4em] text-muted-foreground/70">CampusLoif</p>
             <h1 className="text-3xl sm:text-4xl font-semibold text-foreground">
-              A refined way to experience campus life.
+              Live your campus story with crafted calm.
             </h1>
             <p className="max-w-xl text-sm text-muted-foreground">
-              Discover conversations, events and people through a serene, minimalist surface inspired by the smooth polish of
-              Apple design principles.
+              Discover conversations, events, and the people who elevate your journey through a glassy, composed interface tailor-made for university life.
             </p>
           </div>
           <div className="flex items-center gap-3">

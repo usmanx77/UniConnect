@@ -5,9 +5,9 @@ import { useAuth } from "../contexts/AuthContext";
 import { useToast } from "../hooks/useToast";
 import { validators } from "../lib/utils/validation";
 import { LoadingSpinner } from "./LoadingSpinner";
-import { Eye, EyeOff } from "lucide-react";
+import { Eye, EyeOff, Sparkle } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogTrigger, DialogFooter } from "./ui/dialog";
-import { STORAGE_KEYS } from "../lib/constants";
+import { APP_NAME, STORAGE_KEYS } from "../lib/constants";
 import { authService } from "../lib/services/authService";
 
 export function LoginPage() {
@@ -22,16 +22,11 @@ export function LoginPage() {
   const [resetEmail, setResetEmail] = useState("");
   const [resetError, setResetError] = useState("");
   const [resetSent, setResetSent] = useState(false);
-
-  const handleGoogleLogin = async () => {
-    try {
-      await authService.loginWithOAuth("google");
-      // If Supabase is configured, this will redirect. Otherwise, fallback succeeded.
-      toast.success(toast.messages.success.LOGIN_SUCCESS);
-    } catch {
-      toast.error(toast.messages.error.AUTH_FAILED);
-    }
-  };
+  const highlights = [
+    "Curated happenings tailored to your societies",
+    "Meaningful circles that elevate your campus journey",
+    "A calm, minimal space for focused collaboration",
+  ];
 
   const handleSubmit = async (e: FormEvent) => {
     e.preventDefault();
@@ -73,201 +68,170 @@ export function LoginPage() {
     return <LoadingSpinner fullScreen size="lg" text="Signing in..." />;
   }
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-accent/5 to-primary/10 dark:from-primary/10 dark:via-accent/10 dark:to-primary/20 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background decoration */}
-      <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-accent/20 to-primary/20 rounded-full blur-3xl"></div>
+    <div className="relative flex min-h-screen items-center justify-center overflow-hidden bg-[radial-gradient(circle_at_10%_0%,rgba(107,114,255,0.12),transparent_55%),radial-gradient(circle_at_90%_10%,rgba(56,189,248,0.16),transparent_55%),linear-gradient(180deg,rgba(246,249,255,0.92)_0%,rgba(233,240,255,0.75)_55%,rgba(240,245,255,0.98)_100%)] px-4 py-10 dark:bg-[radial-gradient(circle_at_10%_0%,rgba(99,102,241,0.22),transparent_55%),radial-gradient(circle_at_90%_0%,rgba(56,189,248,0.28),transparent_55%),linear-gradient(180deg,rgba(5,7,15,0.94)_0%,rgba(5,7,15,0.96)_55%,rgba(5,7,15,0.98)_100%)]">
+      <div className="absolute inset-0 -z-10">
+        <div className="absolute left-1/2 top-[-160px] h-[420px] w-[420px] -translate-x-1/2 rounded-full bg-gradient-to-br from-primary/40 via-accent/40 to-purple-400/40 blur-3xl" aria-hidden="true" />
+        <div className="absolute bottom-[-180px] right-[-120px] h-[420px] w-[420px] rounded-full bg-gradient-to-tr from-sky-200/60 via-primary/50 to-purple-400/40 blur-3xl dark:from-sky-500/20 dark:via-primary/30 dark:to-purple-500/20" aria-hidden="true" />
       </div>
-      
-      <div className="w-full max-w-md relative z-10">
-        <div className="text-center mb-8">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-primary/25 ring-4 ring-primary/10 dark:ring-primary/30">
-            <span className="text-white text-3xl font-bold">U</span>
-          </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-3">UniConnect</h1>
-          <p className="text-muted-foreground text-lg">Connect with your university community</p>
-        </div>
 
-        <div className="bg-card/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-border p-8 relative">
-          <Button
-            className="w-full rounded-2xl mb-6 h-14 shadow-lg hover:shadow-xl transition-all duration-300 bg-card hover:bg-accent text-foreground border-2 border-border hover:border-primary/40 font-semibold"
-            onClick={handleGoogleLogin}
-            disabled={isLoading}
-          >
-            <svg className="w-6 h-6 mr-3" viewBox="0 0 24 24">
-              <path
-                fill="currentColor"
-                d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"
-              />
-              <path
-                fill="currentColor"
-                d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"
-              />
-              <path
-                fill="currentColor"
-                d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"
-              />
-              <path
-                fill="currentColor"
-                d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"
-              />
-            </svg>
-            Continue with Google
-          </Button>
-
-          <div className="relative mb-8">
-            <div className="absolute inset-0 flex items-center">
-              <div className="w-full border-t border-border"></div>
+      <div className="relative z-10 mx-auto w-full max-w-6xl">
+        <div className="grid gap-12 lg:grid-cols-[1.05fr_0.95fr] lg:items-center">
+          <div className="space-y-8 text-center lg:text-left">
+            <span className="inline-flex items-center gap-2 rounded-full border border-white/40 bg-white/80 px-4 py-2 text-xs font-semibold uppercase tracking-[0.4em] text-muted-foreground shadow-[0_18px_45px_-30px_rgba(15,23,42,0.5)] backdrop-blur dark:border-white/10 dark:bg-white/10 dark:text-muted-foreground/80">
+              <Sparkle className="h-4 w-4 text-primary" /> Inspired Campus Living
+            </span>
+            <div className="space-y-3">
+              <p className="text-sm font-semibold uppercase tracking-[0.32em] text-muted-foreground/70">Welcome to</p>
+              <h1 className="font-logo text-5xl text-foreground drop-shadow-sm sm:text-6xl">{APP_NAME}</h1>
+              <p className="mx-auto max-w-xl text-lg leading-relaxed text-muted-foreground/90 lg:mx-0">
+                A calm, luxurious hub for students to curate their societies, discover campus opportunities, and stay close to the people who move their journey forward.
+              </p>
             </div>
-            <div className="relative flex justify-center text-sm">
-              <span className="px-4 bg-card text-muted-foreground font-medium">or continue with email</span>
-            </div>
-          </div>
-
-          <form onSubmit={handleSubmit} className="space-y-6">
-            <div className="space-y-2">
-              <label htmlFor="email" className="block text-sm font-semibold text-foreground">University Email</label>
-              <Input
-                id="email"
-                type="email"
-                value={email}
-                onChange={(e) => setEmail(e.target.value)}
-                placeholder="yourname@your-university.edu.pk"
-                className="rounded-2xl h-14 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300 text-lg px-4"
-                required
-                aria-invalid={!!errors.email}
-                aria-describedby={errors.email ? "email-error" : undefined}
-              />
-              {errors.email && (
-                <p id="email-error" className="text-sm text-destructive mt-2 flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  {errors.email}
-                </p>
-              )}
-            </div>
-            <div className="space-y-2">
-              <label htmlFor="password" className="block text-sm font-semibold text-foreground">Password</label>
-              <div className="relative">
-                <Input
-                  id="password"
-                  type={showPassword ? "text" : "password"}
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••"
-                  className="rounded-2xl h-14 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300 text-lg px-4 pr-12"
-                  required
-                  aria-invalid={!!errors.password}
-                  aria-describedby={errors.password ? "password-error" : undefined}
-                />
-                <button
-                  type="button"
-                  onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+            <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-1">
+              {highlights.map(item => (
+                <div
+                  key={item}
+                  className="flex items-start gap-3 rounded-2xl border border-white/60 bg-white/70 px-5 py-4 shadow-[0_24px_60px_-40px_rgba(15,23,42,0.45)] backdrop-blur dark:border-white/10 dark:bg-white/5"
                 >
-                  {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
-                </button>
-              </div>
-              {errors.password && (
-                <p id="password-error" className="text-sm text-destructive mt-2 flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  {errors.password}
-                </p>
-              )}
-            </div>
-            <div className="flex items-center justify-between">
-              <label className="flex items-center gap-3 text-sm text-muted-foreground">
-                <input
-                  type="checkbox"
-                  className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
-                  checked={rememberMe}
-                  onChange={(e) => setRememberMe(e.target.checked)}
-                />
-                Remember me on this device
-              </label>
-              <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
-                <DialogTrigger asChild>
-                  <button type="button" className="text-sm text-primary hover:text-primary/80 font-semibold">Forgot password?</button>
-                </DialogTrigger>
-                <DialogContent>
-                  <DialogHeader>
-                    <DialogTitle>Reset your password</DialogTitle>
-                    <DialogDescription>Enter your .edu.pk email and we will send reset instructions.</DialogDescription>
-                  </DialogHeader>
-                  <div className="space-y-3">
-                    <Input
-                      type="email"
-                      placeholder="yourname@your-university.edu.pk"
-                      value={resetEmail}
-                      onChange={(e) => {
-                        setResetEmail(e.target.value);
-                        setResetError("");
-                        setResetSent(false);
-                      }}
-                    />
-                    {resetError && <p className="text-sm text-destructive">{resetError}</p>}
-                    {resetSent && <p className="text-sm text-primary">If an account exists, a reset email was sent.</p>}
-                  </div>
-                  <DialogFooter>
-                    <Button
-                      type="button"
-                      onClick={async () => {
-                        if (!validators.email(resetEmail)) {
-                          setResetError("Please enter a valid .edu.pk email");
-                          return;
-                        }
-                        try {
-                          await authService.requestPasswordReset(resetEmail);
-                          setResetSent(true);
-                          setResetError("");
-                        } catch {
-                          setResetError("Failed to send reset email");
-                        }
-                      }}
-                    >
-                      Send reset link
-                    </Button>
-                  </DialogFooter>
-                </DialogContent>
-              </Dialog>
-            </div>
-            <Button
-              type="submit"
-              className="w-full rounded-2xl h-14 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
-              disabled={isLoading}
-            >
-              {isLoading ? (
-                <div className="flex items-center gap-2">
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
-                  Signing in...
+                  <div className="mt-1 h-2 w-2 rounded-full bg-gradient-to-r from-primary to-purple-500" />
+                  <p className="text-sm font-medium text-foreground/90 dark:text-foreground">{item}</p>
                 </div>
-              ) : (
-                "Sign In"
-              )}
-            </Button>
-          </form>
-
-          <div className="text-center mt-8 p-4 bg-accent rounded-2xl border border-border">
-            <p className="text-sm text-primary font-medium">
-              🔒 Only official .edu.pk university emails are allowed
-            </p>
+              ))}
+            </div>
           </div>
-        </div>
 
-        <div className="text-center mt-8">
-          <p className="text-muted-foreground text-lg">
-            Don&apos;t have an account?{" "}
-            <button 
-              className="text-primary hover:underline transition-colors duration-200"
-              onClick={() => window.location.href = '/signup'}
-            >
-              Create one now
-            </button>
-          </p>
+          <div className="mx-auto w-full max-w-md">
+            <div className="overflow-hidden rounded-[32px] border border-white/70 bg-white/80 shadow-[0_40px_80px_-45px_rgba(15,23,42,0.55)] backdrop-blur-xl dark:border-white/10 dark:bg-white/5">
+              <div className="border-b border-white/60 bg-gradient-to-r from-primary/15 via-primary/5 to-transparent px-8 py-6 dark:border-white/10 dark:from-primary/15 dark:via-primary/10">
+                <div className="flex flex-col gap-2">
+                  <span className="text-xs font-medium uppercase tracking-[0.24em] text-muted-foreground">Sign in</span>
+                  <h2 className="text-2xl font-semibold text-foreground">Access your campus concierge</h2>
+                  <p className="text-sm text-muted-foreground">Use your verified university credentials to continue.</p>
+                </div>
+              </div>
+
+              <div className="px-8 py-8">
+                <form onSubmit={handleSubmit} className="space-y-6">
+                  <div className="space-y-2">
+                    <label htmlFor="email" className="block text-sm font-semibold text-foreground">University Email</label>
+                    <Input
+                      id="email"
+                      type="email"
+                      value={email}
+                      onChange={(e) => setEmail(e.target.value)}
+                      placeholder="yourname@your-university.edu.pk"
+                      className="h-14 rounded-2xl border-2 border-border bg-input-background/60 px-4 text-lg transition-all duration-300 focus:border-primary focus:ring-primary/20"
+                      required
+                      aria-invalid={!!errors.email}
+                      aria-describedby={errors.email ? "email-error" : undefined}
+                    />
+                    {errors.email && (
+                      <p id="email-error" className="mt-2 flex items-center gap-1 text-sm text-destructive">
+                        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        {errors.email}
+                      </p>
+                    )}
+                  </div>
+                  <div className="space-y-2">
+                    <label htmlFor="password" className="block text-sm font-semibold text-foreground">Password</label>
+                    <div className="relative">
+                      <Input
+                        id="password"
+                        type={showPassword ? "text" : "password"}
+                        value={password}
+                        onChange={(e) => setPassword(e.target.value)}
+                        placeholder="••••••••"
+                        className="h-14 rounded-2xl border-2 border-border bg-input-background/60 px-4 pr-12 text-lg transition-all duration-300 focus:border-primary focus:ring-primary/20"
+                        required
+                        aria-invalid={!!errors.password}
+                        aria-describedby={errors.password ? "password-error" : undefined}
+                      />
+                      <button
+                        type="button"
+                        onClick={() => setShowPassword(!showPassword)}
+                        className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-foreground"
+                      >
+                        {showPassword ? <EyeOff className="h-5 w-5" /> : <Eye className="h-5 w-5" />}
+                      </button>
+                    </div>
+                    {errors.password && (
+                      <p id="password-error" className="mt-2 flex items-center gap-1 text-sm text-destructive">
+                        <svg className="h-4 w-4" fill="currentColor" viewBox="0 0 20 20">
+                          <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                        </svg>
+                        {errors.password}
+                      </p>
+                    )}
+                  </div>
+                  <div className="flex items-center justify-between">
+                    <label className="flex items-center gap-3 text-sm text-muted-foreground">
+                      <input
+                        type="checkbox"
+                        className="h-4 w-4 rounded border-border text-primary focus:ring-primary"
+                        checked={rememberMe}
+                        onChange={(e) => setRememberMe(e.target.checked)}
+                      />
+                      Remember me
+                    </label>
+                    <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
+                      <DialogTrigger asChild>
+                        <button type="button" className="text-sm font-semibold text-primary hover:text-primary/80">Forgot password?</button>
+                      </DialogTrigger>
+                      <DialogContent>
+                        <DialogHeader>
+                          <DialogTitle>Reset your password</DialogTitle>
+                          <DialogDescription>Enter your .edu.pk email and we will send reset instructions.</DialogDescription>
+                        </DialogHeader>
+                        <div className="space-y-3">
+                          <Input
+                            type="email"
+                            placeholder="yourname@your-university.edu.pk"
+                            value={resetEmail}
+                            onChange={(e) => {
+                              setResetEmail(e.target.value);
+                              setResetError("");
+                              setResetSent(false);
+                            }}
+                          />
+                          {resetError && <p className="text-sm text-destructive">{resetError}</p>}
+                          {resetSent && <p className="text-sm text-primary">If an account exists, a reset email was sent.</p>}
+                        </div>
+                        <DialogFooter>
+                          <Button
+                            type="button"
+                            onClick={async () => {
+                              if (!validators.email(resetEmail)) {
+                                setResetError("Please enter a valid .edu.pk email");
+                                return;
+                              }
+                              try {
+                                await authService.requestPasswordReset(resetEmail);
+                                setResetSent(true);
+                                setResetError("");
+                              } catch {
+                                setResetError("We couldn't send the reset email. Try again later.");
+                              }
+                            }}
+                          >
+                            Send reset link
+                          </Button>
+                        </DialogFooter>
+                      </DialogContent>
+                    </Dialog>
+                  </div>
+                  <Button
+                    type="submit"
+                    className="h-14 w-full rounded-2xl bg-gradient-to-r from-primary via-primary/90 to-purple-500 text-lg font-semibold text-white shadow-[0_28px_55px_-30px_rgba(37,99,235,0.85)] transition-transform duration-300 hover:-translate-y-0.5"
+                    disabled={isLoading}
+                  >
+                    Sign in to {APP_NAME}
+                  </Button>
+                </form>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
     </div>

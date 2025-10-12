@@ -104,7 +104,7 @@ npm run build
 
 ```
 1. User lands on LoginPage
-2. Enter credentials or use Google OAuth (mocked)
+2. Enter verified university email credentials
 3. AuthContext validates and stores user data
 4. User redirected to OnboardingPage (if first time)
 5. Complete onboarding → Main application

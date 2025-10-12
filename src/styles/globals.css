@@ -22,6 +22,7 @@
   --input: transparent;
   --input-background: rgba(255, 255, 255, 0.65);
   --switch-background: rgba(15, 23, 42, 0.16);
+  --font-logo: "Pacifico", "cursive";
   --font-weight-medium: 500;
   --font-weight-normal: 400;
   --ring: rgba(10, 132, 255, 0.45);
@@ -62,6 +63,7 @@
   --input: transparent;
   --input-background: rgba(255, 255, 255, 0.05);
   --switch-background: rgba(148, 163, 184, 0.3);
+  --font-logo: "Pacifico", "cursive";
   --font-weight-medium: 500;
   --font-weight-normal: 400;
   --ring: rgba(100, 210, 255, 0.5);
@@ -136,6 +138,11 @@
     background-attachment: fixed;
     min-height: 100vh;
     font-smoothing: antialiased;
+  }
+
+  .font-logo {
+    font-family: var(--font-logo);
+    letter-spacing: 0.02em;
   }
 
   .dark body {

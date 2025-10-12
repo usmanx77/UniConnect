@@ -96,18 +96,6 @@ class AuthService {
     return { user, token };
   }
 
-  async loginWithOAuth(provider: "google"): Promise<void> {
-    if (isSupabaseAvailable()) {
-      const supabase = getSupabaseClient()!;
-      const redirectTo = typeof window !== "undefined" ? window.location.origin : undefined;
-      const { error } = await supabase.auth.signInWithOAuth({ provider, options: { redirectTo } });
-      if (error) throw error;
-      return; // Redirect will occur
-    }
-    // Mock fallback: simulate login
-    await this.login({ email: "student@nu.edu.pk", password: "password123" });
-  }
-
   async logout(): Promise<void> {
     if (isSupabaseAvailable()) {
       const supabase = getSupabaseClient()!;
