@@ -4,17 +4,18 @@ import { Avatar, AvatarFallback } from "./ui/avatar";
 import { Button } from "./ui/button";
 import { ScrollArea } from "./ui/scroll-area";
 import { Badge } from "./ui/badge";
-import { 
-  UserPlus, 
-  Heart, 
-  MessageCircle, 
-  Calendar, 
-  Users, 
-  AtSign, 
+import {
+  UserPlus,
+  Heart,
+  MessageCircle,
+  Calendar,
+  Users,
+  AtSign,
   Award,
   X,
   CheckCheck
 } from "lucide-react";
+import type { LucideIcon } from "lucide-react";
 import { useNotifications } from "../contexts/NotificationContext";
 import type { NotificationType } from "../types";
 
@@ -23,7 +24,7 @@ interface NotificationPanelProps {
   onOpenChange: (open: boolean) => void;
 }
 
-const notificationIcons: Record<NotificationType, any> = {
+const notificationIcons: Record<NotificationType, LucideIcon> = {
   connection_request: UserPlus,
   connection_accepted: UserPlus,
   post_reaction: Heart,
@@ -35,14 +36,14 @@ const notificationIcons: Record<NotificationType, any> = {
 };
 
 const notificationColors: Record<NotificationType, string> = {
-  connection_request: "text-blue-500",
-  connection_accepted: "text-green-500",
-  post_reaction: "text-red-500",
-  post_comment: "text-purple-500",
-  event_reminder: "text-orange-500",
-  society_invite: "text-indigo-500",
-  mention: "text-cyan-500",
-  achievement: "text-yellow-500",
+  connection_request: "text-primary",
+  connection_accepted: "text-primary",
+  post_reaction: "text-destructive",
+  post_comment: "text-primary",
+  event_reminder: "text-accent-foreground",
+  society_invite: "text-primary",
+  mention: "text-primary",
+  achievement: "text-primary",
 };
 
 export function NotificationPanel({ open, onOpenChange }: NotificationPanelProps) {

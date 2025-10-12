@@ -29,6 +29,7 @@ export const ROUTES: Record<PageRoute, { id: PageRoute; label: string; icon: str
   profile: { id: "profile", label: "My Profile", icon: "👤" },
   connections: { id: "connections", label: "Circle", icon: "👥" },
   societies: { id: "societies", label: "Societies", icon: "🎓" },
+  "society-room": { id: "society-room", label: "Society Room", icon: "🏛️" },
   events: { id: "events", label: "Events", icon: "📅" },
   chat: { id: "chat", label: "Messages", icon: "💬" },
   bookmarks: { id: "bookmarks", label: "Bookmarks", icon: "🔖" },

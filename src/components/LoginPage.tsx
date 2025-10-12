@@ -53,7 +53,9 @@ export function LoginPage() {
     // Persist preference for session vs local storage
     try {
       localStorage.setItem(STORAGE_KEYS.AUTH_PERSIST, rememberMe ? "local" : "session");
-    } catch {}
+    } catch (error) {
+      console.error("Failed to persist auth preference:", error);
+    }
     
     try {
       await login({ email: identifier, password });
@@ -67,7 +69,7 @@ export function LoginPage() {
     return <LoadingSpinner fullScreen size="lg" text="Signing in..." />;
   }
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-accent/5 to-primary/10 dark:from-primary/10 dark:via-accent/10 dark:to-primary/20 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl"></div>
@@ -76,15 +78,14 @@ export function LoginPage() {
       
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-3 font-brand">{APP_NAME}</h1>
+          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-primary/25 ring-4 ring-primary/10 dark:ring-primary/30">
+            <span className="text-white text-3xl font-bold">U</span>
+          </div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-3">{APP_NAME}</h1>
           <p className="text-muted-foreground text-lg">Connect with your university community</p>
         </div>
 
         <div className="bg-card/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-border p-8 relative">
-          {/* Google auth removed */}
-
-          {/* Removed extra divider */}
-
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <label htmlFor="identifier" className="block text-sm font-semibold text-foreground">Username or University Email</label>
@@ -119,9 +120,10 @@ export function LoginPage() {
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="Enter your password"
                   autoComplete="current-password"
-                  className="rounded-2xl h-14 pr-12 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300"
+                  className="rounded-2xl h-14 pr-12 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300 text-lg px-4"
                   onKeyUp={(e) => setCapsLockOn((e as any).getModifierState?.("CapsLock"))}
                   onKeyDown={(e) => setCapsLockOn((e as any).getModifierState?.("CapsLock"))}
+                  required
                   aria-invalid={!!errors.password}
                   aria-describedby={errors.password ? "password-error" : undefined}
                 />
@@ -158,7 +160,7 @@ export function LoginPage() {
               </label>
               <Dialog open={forgotOpen} onOpenChange={setForgotOpen}>
                 <DialogTrigger asChild>
-                  <button type="button" className="text-sm text-primary hover:text-primary/90 font-semibold">Forgot password?</button>
+                  <button type="button" className="text-sm text-primary hover:text-primary/80 font-semibold">Forgot password?</button>
                 </DialogTrigger>
                 <DialogContent>
                   <DialogHeader>
@@ -205,7 +207,7 @@ export function LoginPage() {
             </div>
             <Button
               type="submit"
-              className="w-full rounded-2xl h-14 bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
+              className="w-full rounded-2xl h-14 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300"
               disabled={isLoading}
             >
               {isLoading ? (
@@ -219,9 +221,9 @@ export function LoginPage() {
             </Button>
           </form>
 
-          <div className="text-center mt-8 p-4 bg-accent dark:bg-accent/20 rounded-2xl border border-accent/30">
-            <p className="text-sm text-accent-foreground font-medium">
-              Only official .edu.pk university emails are allowed
+          <div className="text-center mt-8 p-4 bg-accent rounded-2xl border border-border">
+            <p className="text-sm text-primary font-medium">
+              🔒 Only official .edu.pk university emails are allowed
             </p>
           </div>
         </div>
@@ -230,8 +232,8 @@ export function LoginPage() {
           <p className="text-muted-foreground text-lg">
             Don&apos;t have an account?{" "}
             <button 
-              className="text-primary hover:text-primary/90 dark:text-primary dark:hover:text-primary/90 font-semibold hover:underline transition-colors duration-200"
-              onClick={() => (window.location.href = '/signup')}
+              className="text-primary hover:underline transition-colors duration-200"
+              onClick={() => window.location.href = '/signup'}
             >
               Create one now
             </button>
@@ -241,4 +243,3 @@ export function LoginPage() {
     </div>
   );
 }
-

@@ -37,16 +37,16 @@ export function BottomNav() {
             <button
               key={item.id}
               onClick={() => navigate(item.id)}
-              className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-all ${
+              className={`flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all ${
                 isActive
                   ? "text-primary bg-accent"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
               }`}
               aria-current={isActive ? "page" : undefined}
               aria-label={item.label}
             >
               <Icon className="h-5 w-5" />
-              <span className="text-xs">{item.label}</span>
+              <span className="text-xs font-medium">{item.label}</span>
             </button>
           );
         })}
@@ -55,20 +55,20 @@ export function BottomNav() {
         <Sheet open={moreMenuOpen} onOpenChange={setMoreMenuOpen}>
           <SheetTrigger asChild>
             <button
-              className={`flex flex-col items-center justify-center gap-1 px-4 py-2 rounded-xl transition-all ${
+              className={`flex flex-col items-center justify-center gap-1 px-3 py-2 rounded-lg transition-all ${
                 ["events", "bookmarks", "settings"].includes(currentPage)
                   ? "text-primary bg-accent"
-                  : "text-muted-foreground hover:text-foreground"
+                  : "text-muted-foreground hover:text-foreground hover:bg-accent/50"
               }`}
               aria-label="More options"
             >
               <MoreHorizontal className="h-5 w-5" />
-              <span className="text-xs">More</span>
+              <span className="text-xs font-medium">More</span>
             </button>
           </SheetTrigger>
-          <SheetContent side="bottom" className="rounded-t-3xl">
+          <SheetContent side="bottom" className="rounded-t-2xl">
             <SheetHeader className="mb-4">
-              <SheetTitle>More Options</SheetTitle>
+              <SheetTitle className="text-lg font-semibold">More Options</SheetTitle>
               <SheetDescription>
                 Access additional features and settings
               </SheetDescription>
@@ -82,7 +82,7 @@ export function BottomNav() {
                     key={item.id}
                     variant={isActive ? "default" : "ghost"}
                     onClick={() => handleNavigation(item.id)}
-                    className="w-full justify-start gap-3 h-12 rounded-xl"
+                    className="w-full justify-start gap-3 h-12 rounded-lg font-medium"
                   >
                     <Icon className="h-5 w-5" />
                     <span>{item.label}</span>

@@ -181,6 +181,8 @@ export interface Event {
 export type RSVPStatus = "going" | "interested" | null;
 
 // Chat Types
+export type ChatRoomType = "dm" | "group" | "society";
+
 export interface ChatMessage {
   id: string;
   senderId: string;
@@ -223,7 +225,7 @@ export interface Notification {
   timestamp: string;
   read: boolean;
   actionUrl?: string;
-  actionData?: any;
+  actionData?: Record<string, unknown>;
 }
 
 // Search Types
@@ -294,23 +296,30 @@ export interface ChatMember {
   is_online: boolean;
 }
 
+export interface TypingUser {
+  user_id: string;
+  user_name: string;
+  timestamp: number;
+}
+
 export interface MessageAttachment {
   id: string;
-  name: string;
-  type: string;
+  type: "image" | "video" | "file" | "audio" | string;
   url: string;
   size: number;
   filename?: string;
+  name?: string;
+  metadata?: {
+    mimeType?: string;
+    [key: string]: unknown;
+  };
 }
 
 export interface MessageReaction {
-  id: string;
-  user_id: string;
-  user_name: string;
   emoji: string;
-  created_at: string;
-  count?: number;
-  users?: string[];
+  users: string[];
+  count: number;
+  created_at?: string;
 }
 
 export interface AggregatedReaction {
@@ -325,22 +334,17 @@ export interface EnhancedMessage {
   author_id: string;
   author_name: string;
   author_avatar?: string;
-  body?: string;
+  content: string;
   attachments: MessageAttachment[];
   reactions: (MessageReaction | AggregatedReaction)[];
   reply_to?: string;
   edited_at?: string;
   created_at: string;
-  updated_at: string;
+  updated_at?: string;
   is_edited: boolean;
   is_deleted: boolean;
-  senderId: string;
-  senderName: string;
-  content: string;
-  timestamp: string;
   read?: boolean;
   type?: "text" | "image" | "file";
-  attachmentUrl?: string;
 }
 
 export interface ChatRoom {
@@ -355,9 +359,9 @@ export interface ChatRoom {
   created_at: string;
   members: ChatMember[];
   unread_count?: number;
-  is_typing: any[];
   unreadCount: number;
-  isOnline: boolean;
+  is_typing: TypingUser[];
+  isOnline?: boolean;
   lastMessage?: ChatMessage;
 }
 
@@ -367,11 +371,36 @@ export interface Users {
   avatar?: string;
 }
 
+export interface CreateRoomInput {
+  roomType: ChatRoomType;
+  name?: string;
+  memberIds: string[];
+  societyId?: string;
+}
+
+export interface SendMessageInput {
+  roomId: string;
+  body?: string;
+  attachments?: File[];
+  replyTo?: string;
+}
+
 // Icon components (these will be imported from lucide-react)
 export interface IconProps {
   className?: string;
   size?: number;
 }
 
-// Re-export commonly used types
-export type { User };
+declare global {
+  interface NotificationAction {
+    action: string;
+    title: string;
+    icon?: string;
+  }
+
+  interface NotificationOptions {
+    actions?: NotificationAction[];
+  }
+}
+
+export {};

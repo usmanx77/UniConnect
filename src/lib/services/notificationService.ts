@@ -1,8 +1,53 @@
 import { supabase } from '../supabaseClient';
 
+type SupabaseNotificationActionData = {
+  room_id?: string | null;
+  room_name?: string | null;
+  sender_id?: string | null;
+  sender_name?: string | null;
+};
+
+type SupabaseNotificationRow = {
+  id: string;
+  type?: string | null;
+  action_data?: SupabaseNotificationActionData | null;
+  avatar_url?: string | null;
+  message?: string | null;
+  timestamp: string;
+  read?: boolean | null;
+};
+
+type ChatNotificationType =
+  | 'new_message'
+  | 'message_reaction'
+  | 'typing_start'
+  | 'typing_stop';
+
+function isSupabaseNotificationRow(value: unknown): value is SupabaseNotificationRow {
+  if (typeof value !== 'object' || value === null) {
+    return false;
+  }
+
+  const record = value as Record<string, unknown>;
+
+  return typeof record.id === 'string' && typeof record.timestamp === 'string';
+}
+
+function parseNotificationType(value: unknown): ChatNotificationType {
+  switch (value) {
+    case 'message_reaction':
+    case 'typing_start':
+    case 'typing_stop':
+    case 'new_message':
+      return value;
+    default:
+      return 'new_message';
+  }
+}
+
 export interface ChatNotification {
   id: string;
-  type: 'new_message' | 'message_reaction' | 'typing_start' | 'typing_stop';
+  type: ChatNotificationType;
   room_id: string;
   room_name: string;
   sender_id: string;
@@ -163,18 +208,27 @@ class NotificationService {
 
       if (error) throw error;
 
-      return data.map(notif => ({
-        id: notif.id,
-        type: notif.type as any,
-        room_id: notif.action_data?.room_id || '',
-        room_name: notif.action_data?.room_name || 'Unknown Room',
-        sender_id: notif.action_data?.sender_id || '',
-        sender_name: notif.action_data?.sender_name || 'Unknown User',
-        sender_avatar: notif.avatar_url,
-        message_preview: notif.message,
-        timestamp: notif.timestamp,
-        read: notif.read
-      }));
+      const notifications = Array.isArray(data)
+        ? data.filter(isSupabaseNotificationRow)
+        : [];
+
+      return notifications.map(notif => {
+        const type = parseNotificationType(notif.type);
+        const actionData = notif.action_data ?? {};
+
+        return {
+          id: notif.id,
+          type,
+          room_id: actionData.room_id ?? '',
+          room_name: actionData.room_name ?? 'Unknown Room',
+          sender_id: actionData.sender_id ?? '',
+          sender_name: actionData.sender_name ?? 'Unknown User',
+          sender_avatar: notif.avatar_url ?? undefined,
+          message_preview: notif.message ?? undefined,
+          timestamp: notif.timestamp,
+          read: Boolean(notif.read)
+        } satisfies ChatNotification;
+      });
     } catch (error) {
       console.error('Failed to fetch notifications:', error);
       return [];
@@ -218,21 +272,28 @@ class NotificationService {
           table: 'notifications',
           filter: `user_id=eq.${userId}`
         }, 
-        async (payload) => {
-          const notif = payload.new as any;
-          
-          if (notif.type === 'new_message') {
+        async (payload: RealtimePostgresChangesPayload<SupabaseNotificationRow>) => {
+          const notif = payload.new;
+
+          if (!isSupabaseNotificationRow(notif)) {
+            return;
+          }
+
+          const type = parseNotificationType(notif.type);
+
+          if (type === 'new_message') {
+            const actionData = notif.action_data ?? {};
             const notification: ChatNotification = {
               id: notif.id,
-              type: notif.type,
-              room_id: notif.action_data?.room_id || '',
-              room_name: notif.action_data?.room_name || 'Unknown Room',
-              sender_id: notif.action_data?.sender_id || '',
-              sender_name: notif.action_data?.sender_name || 'Unknown User',
-              sender_avatar: notif.avatar_url,
-              message_preview: notif.message,
+              type,
+              room_id: actionData.room_id ?? '',
+              room_name: actionData.room_name ?? 'Unknown Room',
+              sender_id: actionData.sender_id ?? '',
+              sender_name: actionData.sender_name ?? 'Unknown User',
+              sender_avatar: notif.avatar_url ?? undefined,
+              message_preview: notif.message ?? undefined,
               timestamp: notif.timestamp,
-              read: notif.read
+              read: Boolean(notif.read)
             };
 
             // Show browser notification

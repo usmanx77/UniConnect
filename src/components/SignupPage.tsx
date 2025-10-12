@@ -124,15 +124,18 @@ export function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-accent/5 to-primary/10 dark:from-primary/10 dark:via-accent/10 dark:to-primary/20 flex items-center justify-center p-4 relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl"></div>
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-accent/20 to-primary/20 rounded-full blur-3xl"></div>
       </div>
 
       <div className="w-full max-w-md relative z-10">
-        <div className="text-center mb-6">
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-3 font-brand">Join {APP_NAME}</h1>
+        <div className="text-center mb-8">
+          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-primary/25 ring-4 ring-primary/10 dark:ring-primary/30">
+            <span className="text-white text-3xl font-bold">U</span>
+          </div>
+          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-3">Join {APP_NAME}</h1>
           <p className="text-muted-foreground text-lg">Connect with your university community</p>
         </div>
 
@@ -191,7 +194,9 @@ export function SignupPage() {
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={(e) => handleInputChange("password", e.target.value)}
-                  placeholder="Enter your password" autoComplete="new-password" className="rounded-2xl h-12 pr-12 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300"
+                  placeholder="Enter your password" 
+                  autoComplete="new-password" 
+                  className="rounded-2xl h-12 pr-12 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300"
                   aria-invalid={!!errors.password}
                   aria-describedby={errors.password ? "password-error" : undefined}
                 />
@@ -213,16 +218,16 @@ export function SignupPage() {
               )}
               <div className="mt-1 text-xs space-y-1">
                 <div className="flex items-center gap-3 text-sm">
-                  <CheckCircle2 className={`w-4 h-4 ${formData.password.length >= 8 ? "text-green-500" : "text-muted-foreground"}`} />
-                  <span className={formData.password.length >= 8 ? "text-primary dark:text-green-400" : "text-muted-foreground"}>At least 8 characters</span>
+                  <CheckCircle2 className={`w-4 h-4 ${formData.password.length >= 8 ? "text-primary" : "text-muted-foreground"}`} />
+                  <span className={formData.password.length >= 8 ? "text-primary" : "text-muted-foreground"}>At least 8 characters</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
-                  <CheckCircle2 className={`w-4 h-4 ${/[A-Z]/.test(formData.password) ? "text-green-500" : "text-muted-foreground"}`} />
-                  <span className={/[A-Z]/.test(formData.password) ? "text-primary dark:text-green-400" : "text-muted-foreground"}>One uppercase letter</span>
+                  <CheckCircle2 className={`w-4 h-4 ${/[A-Z]/.test(formData.password) ? "text-primary" : "text-muted-foreground"}`} />
+                  <span className={/[A-Z]/.test(formData.password) ? "text-primary" : "text-muted-foreground"}>One uppercase letter</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
-                  <CheckCircle2 className={`w-4 h-4 ${/[0-9]/.test(formData.password) ? "text-green-500" : "text-muted-foreground"}`} />
-                  <span className={/[0-9]/.test(formData.password) ? "text-primary dark:text-green-400" : "text-muted-foreground"}>One number</span>
+                  <CheckCircle2 className={`w-4 h-4 ${/[0-9]/.test(formData.password) ? "text-primary" : "text-muted-foreground"}`} />
+                  <span className={/[0-9]/.test(formData.password) ? "text-primary" : "text-muted-foreground"}>One number</span>
                 </div>
               </div>
             </div>
@@ -266,7 +271,11 @@ export function SignupPage() {
             </div>
             {errors.terms && <p className="text-sm text-destructive -mt-1">{errors.terms}</p>}
 
-            <Button type="submit" className="w-full rounded-2xl h-14 bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" disabled={isSubmitting}>
+            <Button 
+              type="submit" 
+              className="w-full rounded-2xl h-14 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" 
+              disabled={isSubmitting}
+            >
               {isSubmitting ? (
                 <div className="flex items-center gap-2">
                   <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin"></div>
@@ -280,9 +289,12 @@ export function SignupPage() {
         </div>
 
         <div className="text-center mt-8">
-          <p className="text-gray-600 dark:text-muted-foreground text-lg">
+          <p className="text-muted-foreground text-lg">
             Already have an account?{" "}
-            <button className="text-primary hover:text-primary/90 dark:text-primary dark:hover:text-primary/90 font-semibold hover:underline transition-colors duration-200" onClick={() => window.history.back()}>
+            <button 
+              className="text-primary hover:underline transition-colors duration-200" 
+              onClick={() => window.history.back()}
+            >
               Sign in
             </button>
           </p>
@@ -291,18 +303,3 @@ export function SignupPage() {
     </div>
   );
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

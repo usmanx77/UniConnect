@@ -25,8 +25,8 @@ export function AppRouter() {
   }
 
   // Check if we're on special routes
-  const isSignupPage = window.location.pathname === '/signup';
-  const isResetPage = window.location.pathname === '/reset';
+  const isSignupPage = typeof window !== 'undefined' && window.location.pathname === '/signup';
+  const isResetPage = typeof window !== 'undefined' && window.location.pathname === '/reset';
 
   // Show signup page if on signup route
   if (isSignupPage) {

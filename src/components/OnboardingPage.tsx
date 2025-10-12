@@ -25,7 +25,7 @@ export function OnboardingPage() {
   const { completeOnboarding, isLoading } = useAuth();
   const toast = useToast();
 
-  const totalSteps = 6;
+  const totalSteps = 5;
 
   const handleNext = () => {
     if (step < totalSteps) {
@@ -54,12 +54,11 @@ export function OnboardingPage() {
 
   const canProceed = () => {
     switch (step) {
-      case 1: return formData.name.trim().length >= 2 && !!formData.dob && (formData.gender === 'male' || formData.gender === 'female');
+      case 1: return formData.batch;
       case 2: return formData.department;
-      case 3: return formData.batch && (formData.session === 'Fall' || formData.session === 'Spring');
+      case 3: return formData.bio.length >= 10;
       case 4: return formData.interests.length >= 2 && formData.interests.length <= 5;
-      case 5: return formData.societies.length >= 1 && formData.societies.length <= 5;
-      case 6: return true;
+      case 5: return true;
       default: return false;
     }
   };
@@ -93,31 +92,29 @@ export function OnboardingPage() {
 
   const getStepTitle = (stepNumber: number) => {
     switch (stepNumber) {
-      case 1: return "About you";
+      case 1: return "Select Your Batch";
       case 2: return "Department";
-      case 3: return "Batch & Session";
+      case 3: return "Tell us about yourself";
       case 4: return "Your interests";
-      case 5: return "Societies";
-      case 6: return "Profile setup";
+      case 5: return "Profile setup";
       default: return "Welcome!";
     }
   };
 
   const getStepDescription = (stepNumber: number) => {
     switch (stepNumber) {
-      case 1: return "Your name, DOB and gender";
+      case 1: return "Which batch are you from?";
       case 2: return "Which department are you in?";
-      case 3: return "Pick your batch and session";
+      case 3: return "Share a bit about yourself";
       case 4: return "Select up to 5 interests";
-      case 5: return "Choose societies you vibe with (max 5)";
-      case 6: return "Almost done! Let's set up your profile";
+      case 5: return "Almost done! Let's finish your profile";
       default: return "You're all set!";
     }
   };
 
   if (step === 6) {
     return (
-      <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-accent/5 to-primary/10 dark:from-primary/10 dark:via-accent/10 dark:to-primary/20 flex items-center justify-center p-4 relative overflow-hidden">
         {/* Background decoration */}
         <div className="absolute inset-0 overflow-hidden">
           <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl"></div>
@@ -126,7 +123,7 @@ export function OnboardingPage() {
         
         <div className="w-full max-w-md text-center relative z-10">
           <div className="bg-card/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-border p-8">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-primary/25 ring-4 ring-primary/20">
+            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-primary/25 ring-4 ring-primary/10 dark:ring-primary/30">
               <CheckCircle2 className="w-12 h-12 text-white" />
             </div>
             <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Welcome to {APP_NAME}!</h2>
@@ -138,7 +135,7 @@ export function OnboardingPage() {
             </div>
             <Button 
               onClick={handleComplete} 
-              className="w-full rounded-2xl h-14 bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50" 
+              className="w-full rounded-2xl h-14 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50" 
               disabled={isLoading}
             >
               {isLoading ? (
@@ -157,7 +154,7 @@ export function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-accent/5 to-primary/10 dark:from-primary/10 dark:via-accent/10 dark:to-primary/20 flex items-center justify-center p-4 relative overflow-hidden">
       {/* Background decoration */}
       <div className="absolute inset-0 overflow-hidden">
         <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl"></div>
@@ -166,7 +163,7 @@ export function OnboardingPage() {
       
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary via-primary to-accent flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-primary/25 ring-4 ring-primary/20">
+          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-primary/25 ring-4 ring-primary/10 dark:ring-primary/30">
             <span className="text-white text-3xl font-bold">U</span>
           </div>
           <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Complete Your Profile</h2>
@@ -181,9 +178,9 @@ export function OnboardingPage() {
                 key={i}
                 className={`flex-1 h-3 rounded-full transition-all duration-500 ${
                   step > i + 1 
-                    ? "bg-gradient-to-r from-primary to-accent shadow-lg shadow-purple-500/30" 
+                    ? "bg-gradient-to-r from-primary to-accent shadow-lg shadow-primary/30" 
                     : step === i + 1 
-                    ? "bg-gradient-to-r from-primary/90 to-accent/90 shadow-md shadow-purple-400/20" 
+                    ? "bg-gradient-to-r from-primary/70 to-accent/70 shadow-md shadow-primary/20" 
                     : "bg-muted"
                 }`}
               />
@@ -192,7 +189,7 @@ export function OnboardingPage() {
 
           {/* Step header */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10  flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 dark:from-primary/20 dark:to-accent/20 flex items-center justify-center mx-auto mb-6 shadow-lg">
               <div className="w-8 h-8 text-primary">
                 {getStepIcon(step)}
               </div>
@@ -254,10 +251,10 @@ export function OnboardingPage() {
                   </p>
                   <div className={`px-3 py-1 rounded-full text-xs font-medium ${
                     formData.bio.length >= 10 
-                      ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400" 
-                      : "bg-accent text-muted-foreground"
+                      ? "bg-primary/10 text-primary" 
+                      : "bg-muted text-muted-foreground"
                   }`}>
-                    {formData.bio.length >= 10 ? "? Valid" : "Too short"}
+                    {formData.bio.length >= 10 ? "✓ Valid" : "Too short"}
                   </div>
                 </div>
               </div>
@@ -276,8 +273,8 @@ export function OnboardingPage() {
                       onClick={() => toggleInterest(category)}
                       className={`p-4 rounded-2xl border-2 text-lg font-semibold transition-all duration-300 ${
                         formData.interests.includes(category)
-                          ? "border-primary bg-gradient-to-br from-primary/10 to-accent/10 dark:from-purple-900/20 dark:to-violet-900/20 text-primary shadow-lg shadow-primary/20"
-                          : "border-border hover:border-primary/40 hover:bg-primary/10 dark:hover:bg-purple-950/10 text-foreground"
+                          ? "border-primary bg-gradient-to-br from-primary/5 to-accent/5 text-primary shadow-lg shadow-primary/20"
+                          : "border-border hover:border-primary hover:bg-accent text-foreground"
                       }`}
                     >
                       {category}
@@ -287,8 +284,8 @@ export function OnboardingPage() {
                 <div className="text-center">
                   <div className={`inline-flex items-center gap-2 px-4 py-2 rounded-full text-sm font-medium ${
                     formData.interests.length >= 2 
-                      ? "bg-green-100 text-green-700 dark:bg-green-900/20 dark:text-green-400" 
-                      : "bg-orange-100 text-orange-700 dark:bg-orange-900/20 dark:text-orange-400"
+                      ? "bg-primary/10 text-primary" 
+                      : "bg-muted text-muted-foreground"
                   }`}>
                     <span>{formData.interests.length} selected</span>
                     {formData.interests.length >= 2 && <CheckCircle2 className="w-4 h-4" />}
@@ -299,7 +296,7 @@ export function OnboardingPage() {
 
             {step === 5 && (
               <div className="text-center space-y-6">
-                <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary/10 to-accent/10  flex items-center justify-center mx-auto shadow-lg">
+                <div className="w-24 h-24 rounded-3xl bg-gradient-to-br from-primary/10 to-accent/10 dark:from-primary/20 dark:to-accent/20 flex items-center justify-center mx-auto shadow-lg">
                   <Camera className="w-10 h-10 text-primary" />
                 </div>
                 <div>
@@ -309,7 +306,7 @@ export function OnboardingPage() {
                   </p>
                   <Button 
                     variant="outline" 
-                    className="rounded-2xl h-12 px-8 border-2 border-primary/30 hover:border-primary/50 hover:bg-primary/10 dark:hover:bg-primary/10 font-semibold"
+                    className="rounded-2xl h-12 px-8 border-2 border-border hover:border-primary hover:bg-accent font-semibold"
                   >
                     Upload Photo
                   </Button>
@@ -323,7 +320,7 @@ export function OnboardingPage() {
                 <Button
                   onClick={handleBack}
                   variant="outline"
-                  className="flex-1 rounded-2xl h-14 border-2 border-border hover:border-primary/40 hover:bg-primary/10 dark:hover:bg-primary/10 font-semibold"
+                  className="flex-1 rounded-2xl h-14 border-2 border-border hover:border-primary hover:bg-accent font-semibold"
                 >
                   <ArrowLeft className="w-5 h-5 mr-2" />
                   Back
@@ -332,7 +329,7 @@ export function OnboardingPage() {
               <Button
                 onClick={step === totalSteps ? () => setStep(6) : handleNext}
                 disabled={!canProceed()}
-                className={`${step === 1 ? "w-full" : "flex-1"} rounded-2xl h-14 bg-gradient-to-r from-primary to-accent hover:from-primary hover:to-accent text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
+                className={`${step === 1 ? "w-full" : "flex-1"} rounded-2xl h-14 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
               >
                 {step === totalSteps ? "Review" : "Continue"}
                 {step < totalSteps && <ArrowRight className="w-5 h-5 ml-2" />}
@@ -344,9 +341,3 @@ export function OnboardingPage() {
     </div>
   );
 }
-
-
-
-
-
-

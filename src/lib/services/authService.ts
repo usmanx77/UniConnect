@@ -1,13 +1,12 @@
+import type { User as SupabaseAuthUser } from "@supabase/supabase-js";
 import type { User, LoginCredentials, OnboardingData } from "../../types";
-import { API_CONFIG, ERROR_MESSAGES, STORAGE_KEYS } from "../constants";
+import { ERROR_MESSAGES, STORAGE_KEYS } from "../constants";
 import { supabase } from "../supabaseClient";
 
 // Mock delay to simulate API call
 const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 class AuthService {
-  private baseUrl = API_CONFIG.BASE_URL;
-
   async login(credentials: LoginCredentials): Promise<{ user: User; token: string }> {
     const { data, error } = await supabase.auth.signInWithPassword({
       email: credentials.email.trim(),
@@ -40,7 +39,7 @@ class AuthService {
   }
 
   async signUp(email: string, password: string, username?: string): Promise<void> {
-    const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/reset` : undefined;
+    const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/verify` : undefined;
     const { data, error } = await supabase.auth.signUp({
       email: email.trim(),
       password,
@@ -186,9 +185,9 @@ class AuthService {
   }
 
   async verifyToken(token: string): Promise<boolean> {
-    await delay(300);
-    // Mock token verification
-    return token.startsWith("mock-jwt-token");
+    // A simple check: fetch current session
+    const { data } = await supabase.auth.getSession();
+    return Boolean(data.session?.access_token === token);
   }
 
   async requestPasswordReset(email: string): Promise<void> {
@@ -196,7 +195,7 @@ class AuthService {
     if (!em.toLowerCase().endsWith('.edu.pk')) {
       throw new Error('Please use your official .edu.pk university email address');
     }
-    const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/` : undefined;
+    const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/reset` : undefined;
     const { error } = await supabase.auth.resetPasswordForEmail(em, { redirectTo });
     if (error) throw new Error(error.message || ERROR_MESSAGES.AUTH_FAILED);
   }

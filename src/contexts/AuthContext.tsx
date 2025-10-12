@@ -6,6 +6,7 @@ import { STORAGE_KEYS } from "../lib/constants";
 
 interface AuthContextValue extends AuthState {
   login: (credentials: LoginCredentials) => Promise<void>;
+  signup: (credentials: LoginCredentials) => Promise<void>;
   logout: () => Promise<void>;
   completeOnboarding: (data: OnboardingData) => Promise<void>;
   updateUser: (user: Partial<User>) => void;
@@ -139,7 +140,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         other.removeItem(STORAGE_KEYS.AUTH_TOKEN);
         other.removeItem(STORAGE_KEYS.USER_DATA);
         other.removeItem(STORAGE_KEYS.ONBOARDING_COMPLETE);
-      } catch {}
+      } catch (error) {
+        console.error("Failed to clear persisted auth data:", error);
+      }
       storage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
       storage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
       // verification state is driven by Supabase; leave as-is
@@ -162,6 +165,43 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  const signup = async (credentials: LoginCredentials) => {
+    setState(prev => ({ ...prev, isLoading: true, error: null }));
+    try {
+      const { user, token } = await authService.signup(credentials);
+      // If we obtained a session token immediately, persist and authenticate
+      const persistPref = (typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEYS.AUTH_PERSIST) : null) || 'local';
+      const storage: Storage = persistPref === 'session' ? sessionStorage : localStorage;
+      try {
+        const other = persistPref === 'session' ? localStorage : sessionStorage;
+        other.removeItem(STORAGE_KEYS.AUTH_TOKEN);
+        other.removeItem(STORAGE_KEYS.USER_DATA);
+        other.removeItem(STORAGE_KEYS.ONBOARDING_COMPLETE);
+      } catch (error) {
+        console.error("Failed to clear persisted auth data:", error);
+      }
+      if (token) {
+        storage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
+      }
+      storage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
+
+      setState({
+        isAuthenticated: Boolean(token),
+        isOnboarded: false,
+        user,
+        isLoading: false,
+        error: null,
+      });
+    } catch (error) {
+      setState(prev => ({
+        ...prev,
+        isLoading: false,
+        error: error instanceof Error ? error.message : "Signup failed",
+      }));
+      throw error;
+    }
+  };
+
   const logout = async () => {
     setState(prev => ({ ...prev, isLoading: true }));
     
@@ -175,7 +215,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         sessionStorage.removeItem(STORAGE_KEYS.AUTH_TOKEN);
         sessionStorage.removeItem(STORAGE_KEYS.USER_DATA);
         sessionStorage.removeItem(STORAGE_KEYS.ONBOARDING_COMPLETE);
-      } catch {}
+      } catch (error) {
+        console.error("Failed to clear auth storage during logout:", error);
+      }
       
       setState({
         isAuthenticated: false,
@@ -228,6 +270,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const value: AuthContextValue = {
     ...state,
     login,
+    signup,
     logout,
     completeOnboarding,
     updateUser,

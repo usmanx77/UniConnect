@@ -1,12 +1,12 @@
 import { createContext, useContext, useState, useEffect, ReactNode, useCallback, useRef } from "react";
 import { chatService } from "../lib/services/chatService";
-import type { 
-  ChatRoom, 
-  EnhancedMessage, 
-  TypingUser, 
-  CreateRoomInput, 
-  SendMessageInput 
-} from "../lib/services/chatService";
+import type {
+  ChatRoom,
+  EnhancedMessage,
+  TypingUser,
+  CreateRoomInput,
+  SendMessageInput
+} from "../types";
 import { useAuth } from "./AuthContext";
 
 interface ChatContextValue {
@@ -51,50 +51,47 @@ export function ChatProvider({ children }: { children: ReactNode }) {
   const [searchQuery, setSearchQuery] = useState("");
   const [searchResults, setSearchResults] = useState<EnhancedMessage[]>([]);
 
+  type MessageSubscription = { unsubscribe: () => void };
+
   // Refs for subscriptions
-  const messageSubscriptionRef = useRef<any>(null);
-  const typingSubscriptionRef = useRef<any>(null);
+  const messageSubscriptionRef = useRef<MessageSubscription | null>(null);
+  const typingSubscriptionRef = useRef<(() => void) | null>(null);
   const typingTimeoutRef = useRef<NodeJS.Timeout | null>(null);
 
-  // Load rooms on mount
-  useEffect(() => {
-    if (user) {
-      loadRooms();
+  const cleanupSubscriptions = useCallback(() => {
+    if (messageSubscriptionRef.current) {
+      messageSubscriptionRef.current.unsubscribe();
+      messageSubscriptionRef.current = null;
     }
-  }, [user]);
-
-  // Set up real-time subscriptions when current room changes
-  useEffect(() => {
-    if (currentRoom) {
-      setupRealtimeSubscriptions(currentRoom.id);
-    } else {
-      cleanupSubscriptions();
+    if (typingSubscriptionRef.current) {
+      typingSubscriptionRef.current();
+      typingSubscriptionRef.current = null;
     }
+  }, []);
 
-    return () => {
-      cleanupSubscriptions();
-    };
+  const markAsRead = useCallback(async () => {
+    if (!currentRoom) return;
+
+    try {
+      await chatService.markAsRead(currentRoom.id);
+      // Update local state
+      setRooms(prev =>
+        prev.map(room =>
+          room.id === currentRoom.id
+            ? { ...room, unreadCount: 0 }
+            : room
+        )
+      );
+    } catch (err) {
+      console.error('Failed to mark as read:', err);
+    }
   }, [currentRoom]);
 
-  // Set up typing status listener
-  useEffect(() => {
-    const handleTypingStatusChange = (event: CustomEvent) => {
-      if (currentRoom && event.detail.roomId === currentRoom.id) {
-        setTypingUsers(event.detail.typingUsers);
-      }
-    };
-
-    window.addEventListener('typingStatusChanged', handleTypingStatusChange as EventListener);
-    return () => {
-      window.removeEventListener('typingStatusChanged', handleTypingStatusChange as EventListener);
-    };
-  }, [currentRoom]);
-
-  const setupRealtimeSubscriptions = (roomId: string) => {
+  const setupRealtimeSubscriptions = useCallback((roomId: string) => {
     // Subscribe to new messages
     messageSubscriptionRef.current = chatService.subscribeToMessages(roomId, (message) => {
       setMessages(prev => [...prev, message]);
-      
+
       // Mark as read if user is viewing this room
       if (currentRoom?.id === roomId) {
         markAsRead();
@@ -105,18 +102,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     typingSubscriptionRef.current = chatService.subscribeToTyping(roomId, (users) => {
       setTypingUsers(users);
     });
-  };
-
-  const cleanupSubscriptions = () => {
-    if (messageSubscriptionRef.current) {
-      messageSubscriptionRef.current.unsubscribe();
-      messageSubscriptionRef.current = null;
-    }
-    if (typingSubscriptionRef.current) {
-      typingSubscriptionRef.current();
-      typingSubscriptionRef.current = null;
-    }
-  };
+  }, [currentRoom, markAsRead]);
 
   const loadRooms = useCallback(async () => {
     try {
@@ -171,10 +157,10 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     try {
       setError(null);
       await chatService.editMessage(messageId, newBody);
-      setMessages(prev => 
-        prev.map(msg => 
-          msg.id === messageId 
-            ? { ...msg, body: newBody, is_edited: true, edited_at: new Date().toISOString() }
+      setMessages(prev =>
+        prev.map(msg =>
+          msg.id === messageId
+            ? { ...msg, content: newBody, isEdited: true, editedAt: new Date().toISOString() }
             : msg
         )
       );
@@ -255,6 +241,17 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     }
   }, [user]);
 
+  const stopTyping = useCallback(() => {
+    if (!currentRoom) return;
+
+    if (typingTimeoutRef.current) {
+      clearTimeout(typingTimeoutRef.current);
+      typingTimeoutRef.current = null;
+    }
+
+    chatService.stopTyping(currentRoom.id);
+  }, [currentRoom]);
+
   const startTyping = useCallback(() => {
     if (!currentRoom) return;
 
@@ -270,36 +267,7 @@ export function ChatProvider({ children }: { children: ReactNode }) {
     typingTimeoutRef.current = setTimeout(() => {
       stopTyping();
     }, 3000);
-  }, [currentRoom]);
-
-  const stopTyping = useCallback(() => {
-    if (!currentRoom) return;
-
-    if (typingTimeoutRef.current) {
-      clearTimeout(typingTimeoutRef.current);
-      typingTimeoutRef.current = null;
-    }
-
-    chatService.stopTyping(currentRoom.id);
-  }, [currentRoom]);
-
-  const markAsRead = useCallback(async () => {
-    if (!currentRoom) return;
-
-    try {
-      await chatService.markAsRead(currentRoom.id);
-      // Update local state
-      setRooms(prev => 
-        prev.map(room => 
-          room.id === currentRoom.id 
-            ? { ...room, unread_count: 0 }
-            : room
-        )
-      );
-    } catch (err) {
-      console.error('Failed to mark as read:', err);
-    }
-  }, [currentRoom]);
+  }, [currentRoom, stopTyping]);
 
   const searchMessages = useCallback(async (query: string) => {
     try {
@@ -337,6 +305,42 @@ export function ChatProvider({ children }: { children: ReactNode }) {
       setMessages([]);
     }
   }, [loadMessages, markAsRead]);
+
+  // Load rooms on mount
+  useEffect(() => {
+    if (user) {
+      loadRooms();
+    }
+  }, [user, loadRooms]);
+
+  // Set up real-time subscriptions when current room changes
+  useEffect(() => {
+    if (currentRoom) {
+      setupRealtimeSubscriptions(currentRoom.id);
+    } else {
+      cleanupSubscriptions();
+    }
+
+    return () => {
+      cleanupSubscriptions();
+    };
+  }, [currentRoom, setupRealtimeSubscriptions, cleanupSubscriptions]);
+
+  // Set up typing status listener
+  useEffect(() => {
+    const handleTypingStatusChange = (
+      event: CustomEvent<{ roomId: string; typingUsers: TypingUser[] }>
+    ) => {
+      if (currentRoom && event.detail.roomId === currentRoom.id) {
+        setTypingUsers(event.detail.typingUsers);
+      }
+    };
+
+    window.addEventListener('typingStatusChanged', handleTypingStatusChange as EventListener);
+    return () => {
+      window.removeEventListener('typingStatusChanged', handleTypingStatusChange as EventListener);
+    };
+  }, [currentRoom]);
 
   const value: ChatContextValue = {
     // State

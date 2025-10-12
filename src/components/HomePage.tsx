@@ -169,13 +169,13 @@ export function HomePage({ onOpenCreatePost }: HomePageProps) {
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
-      <div className="max-w-7xl mx-auto px-4 pt-6 pb-20 md:pb-6">
+      <div className="max-w-6xl mx-auto px-4 pt-4 pb-20 md:pb-6">
         {/* Stories Bar */}
-        <div className="mb-6">
+        <div className="mb-4">
           <StoriesBar />
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
             {/* Main Feed */}
             <div className="lg:col-span-2 space-y-4">
               <PostComposer onOpenCreatePost={onOpenCreatePost} />
@@ -217,11 +217,11 @@ export function HomePage({ onOpenCreatePost }: HomePageProps) {
               <motion.div
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
-                className="bg-card rounded-2xl border border-border p-4 shadow-sm sticky top-[92px]"
+                className="bg-card rounded-lg border border-border p-4 shadow-sm sticky top-[92px]"
               >
                 <div className="flex items-center gap-2 mb-4">
                   <Users className="h-5 w-5 text-primary" />
-                  <h3 className="text-sm">People You May Know</h3>
+                  <h3 className="text-sm font-semibold text-foreground">People You May Know</h3>
                 </div>
                 <div className="space-y-3">
                   {suggestedConnections.map((connection) => (
@@ -232,21 +232,21 @@ export function HomePage({ onOpenCreatePost }: HomePageProps) {
                         </AvatarFallback>
                       </Avatar>
                       <div className="flex-1 min-w-0">
-                        <h4 className="text-sm truncate">{connection.name}</h4>
+                        <h4 className="text-sm font-medium truncate text-foreground">{connection.name}</h4>
                         <p className="text-xs text-muted-foreground truncate">
                           {connection.department}
                         </p>
                         <p className="text-xs text-muted-foreground">
-                          {connection.mutualConnections} mutual
+                          {connection.mutualConnections} mutual connections
                         </p>
                       </div>
-                      <Button size="sm" variant="outline" className="rounded-xl flex-shrink-0">
+                      <Button size="sm" variant="outline" className="rounded-lg flex-shrink-0 text-xs px-3 py-1">
                         Connect
                       </Button>
                     </div>
                   ))}
                 </div>
-                <Button variant="ghost" className="w-full mt-4 rounded-xl text-sm">
+                <Button variant="ghost" className="w-full mt-4 rounded-lg text-sm text-primary hover:bg-accent">
                   View All Suggestions
                 </Button>
               </motion.div>
@@ -256,18 +256,18 @@ export function HomePage({ onOpenCreatePost }: HomePageProps) {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-card rounded-2xl border border-border p-4 shadow-sm"
+                className="bg-card rounded-lg border border-border p-4 shadow-sm"
               >
                 <div className="flex items-center gap-2 mb-4">
                   <Calendar className="h-5 w-5 text-primary" />
-                  <h3 className="text-sm">Upcoming Events</h3>
+                  <h3 className="text-sm font-semibold text-foreground">Upcoming Events</h3>
                 </div>
                 <div className="space-y-3">
                   {upcomingEvents.map((event, i) => (
-                    <div key={i} className="relative p-3 bg-gradient-to-r rounded-xl overflow-hidden group cursor-pointer">
-                      <div className={`absolute inset-0 bg-gradient-to-r ${event.color} opacity-10 group-hover:opacity-20 transition-opacity`} />
+                    <div key={i} className="relative p-3 bg-gradient-to-r rounded-lg overflow-hidden group cursor-pointer hover:bg-accent/50 transition-colors">
+                      <div className={`absolute inset-0 bg-gradient-to-r ${event.color} opacity-5 group-hover:opacity-10 transition-opacity`} />
                       <div className="relative">
-                        <h4 className="text-sm mb-1">{event.title}</h4>
+                        <h4 className="text-sm font-medium mb-1 text-foreground">{event.title}</h4>
                         <p className="text-xs text-muted-foreground">
                           {event.date} • {event.organizer}
                         </p>
@@ -275,7 +275,7 @@ export function HomePage({ onOpenCreatePost }: HomePageProps) {
                     </div>
                   ))}
                 </div>
-                <Button variant="outline" className="w-full mt-4 rounded-xl">
+                <Button variant="ghost" className="w-full mt-4 rounded-lg text-sm text-primary hover:bg-accent">
                   View All Events
                 </Button>
               </motion.div>
@@ -285,20 +285,20 @@ export function HomePage({ onOpenCreatePost }: HomePageProps) {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-card rounded-2xl border border-border p-4 shadow-sm"
+                className="bg-card rounded-lg border border-border p-4 shadow-sm"
               >
                 <div className="flex items-center gap-2 mb-4">
                   <TrendingUp className="h-5 w-5 text-primary" />
-                  <h3 className="text-sm">Trending Topics</h3>
+                  <h3 className="text-sm font-semibold text-foreground">Trending Topics</h3>
                 </div>
                 <div className="space-y-2">
                   {trendingTopics.map((topic, i) => (
                     <button
                       key={i}
-                      className="block w-full text-left px-3 py-2 rounded-xl hover:bg-accent transition-colors group"
+                      className="block w-full text-left px-3 py-2 rounded-lg hover:bg-accent transition-colors group"
                     >
                       <div className="flex items-center justify-between">
-                        <p className="text-sm text-primary group-hover:underline">{topic.tag}</p>
+                        <p className="text-sm font-medium text-primary group-hover:underline">{topic.tag}</p>
                         <Sparkles className="h-3 w-3 text-muted-foreground" />
                       </div>
                       <p className="text-xs text-muted-foreground">{topic.posts} posts</p>

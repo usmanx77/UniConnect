@@ -58,7 +58,15 @@ export const validators = {
   },
 
   imageFile: (file: File): { valid: boolean; message?: string } => {
-    if (!VALIDATION.ALLOWED_IMAGE_TYPES.includes(file.type)) {
+    const normalizedType = (file.type || "").toLowerCase();
+    const allowedMimeTypes = VALIDATION.ALLOWED_IMAGE_TYPES.map(type => type.toLowerCase());
+    const fileExtension = file.name.split(".").pop()?.toLowerCase();
+    const allowedExtensions = ["jpg", "jpeg", "png", "webp"];
+
+    const matchesMimeType = normalizedType ? allowedMimeTypes.includes(normalizedType) : false;
+    const matchesExtension = fileExtension ? allowedExtensions.includes(fileExtension) : false;
+
+    if (!matchesMimeType && !matchesExtension) {
       return {
         valid: false,
         message: "Please upload a JPEG, PNG, or WebP image",

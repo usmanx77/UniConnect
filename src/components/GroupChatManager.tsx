@@ -34,8 +34,8 @@ export function GroupChatManager({ roomId, isOpen, onClose }: GroupChatManagerPr
   const [selectedMembers, setSelectedMembers] = useState<string[]>([]);
 
   const currentRoom = rooms.find(room => room.id === roomId);
-  const isAdmin = currentRoom?.members.find(member => 
-    member.user_id === user?.id && member.role === 'admin'
+  const isAdmin = currentRoom?.members.find(member =>
+    member.userId === user?.id && member.role === 'admin'
   );
 
   // Mock users for demonstration - in real app, this would come from API
@@ -49,7 +49,7 @@ export function GroupChatManager({ roomId, isOpen, onClose }: GroupChatManagerPr
 
   const filteredUsers = availableUsers.filter(user =>
     user.name.toLowerCase().includes(searchQuery.toLowerCase()) &&
-    !currentRoom?.members.some(member => member.user_id === user.id)
+    !currentRoom?.members.some(member => member.userId === user.id)
   );
 
   const handleCreateGroup = async () => {
@@ -57,9 +57,9 @@ export function GroupChatManager({ roomId, isOpen, onClose }: GroupChatManagerPr
 
     try {
       await createRoom({
-        room_type: 'group',
+        roomType: 'group',
         name: newGroupName,
-        member_ids: selectedMembers
+        memberIds: selectedMembers
       });
       setNewGroupName("");
       setSelectedMembers([]);
@@ -149,7 +149,7 @@ export function GroupChatManager({ roomId, isOpen, onClose }: GroupChatManagerPr
                         <p className="text-xs text-muted-foreground">{user.department}</p>
                       </div>
                       {user.isOnline && (
-                        <div className="w-2 h-2 bg-green-500 rounded-full" />
+                        <div className="w-2 h-2 bg-primary rounded-full" />
                       )}
                     </div>
                   ))}
@@ -200,11 +200,11 @@ export function GroupChatManager({ roomId, isOpen, onClose }: GroupChatManagerPr
               <div className="space-y-2">
                 {currentRoom?.members.map((member) => (
                   <div
-                    key={member.user_id}
+                    key={member.userId}
                     className="flex items-center gap-3 p-3 rounded-lg hover:bg-accent"
                   >
                     <Avatar className="h-10 w-10">
-                      <AvatarImage src={member.avatar_url} />
+                      <AvatarImage src={member.avatarUrl} />
                       <AvatarFallback className="bg-primary text-white">
                         {member.name.charAt(0)}
                       </AvatarFallback>
@@ -213,17 +213,17 @@ export function GroupChatManager({ roomId, isOpen, onClose }: GroupChatManagerPr
                       <div className="flex items-center gap-2">
                         <p className="text-sm font-medium">{member.name}</p>
                         {member.role === 'admin' && (
-                          <Crown className="h-4 w-4 text-yellow-500" />
+                          <Crown className="h-4 w-4 text-primary" />
                         )}
                         {member.role === 'owner' && (
-                          <Shield className="h-4 w-4 text-blue-500" />
+                          <Shield className="h-4 w-4 text-primary" />
                         )}
                       </div>
                       <p className="text-xs text-muted-foreground">
-                        {member.is_online ? 'Online' : 'Offline'}
+                        {member.isOnline ? 'Online' : 'Offline'}
                       </p>
                     </div>
-                    {isAdmin && member.user_id !== user?.id && (
+                    {isAdmin && member.userId !== user?.id && (
                       <DropdownMenu>
                         <DropdownMenuTrigger asChild>
                           <Button variant="ghost" size="icon" className="h-8 w-8">
@@ -231,12 +231,12 @@ export function GroupChatManager({ roomId, isOpen, onClose }: GroupChatManagerPr
                           </Button>
                         </DropdownMenuTrigger>
                         <DropdownMenuContent align="end">
-                          <DropdownMenuItem onClick={() => handlePromoteToAdmin(member.user_id)}>
+                          <DropdownMenuItem onClick={() => handlePromoteToAdmin(member.userId)}>
                             <Crown className="h-4 w-4 mr-2" />
                             Promote to Admin
                           </DropdownMenuItem>
-                          <DropdownMenuItem 
-                            onClick={() => handleRemoveMember(member.user_id)}
+                          <DropdownMenuItem
+                            onClick={() => handleRemoveMember(member.userId)}
                             className="text-destructive"
                           >
                             <UserMinus className="h-4 w-4 mr-2" />
