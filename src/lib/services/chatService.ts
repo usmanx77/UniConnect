@@ -2,12 +2,9 @@ import type {
   MessageAttachment,
   MessageReaction
 } from "../../types";
-import { createClient } from '@supabase/supabase-js';
+import { supabase } from '../supabaseClient';
 
-// Supabase configuration
-const supabaseUrl = import.meta.env.VITE_SUPABASE_URL || 'https://your-project.supabase.co';
-const supabaseKey = import.meta.env.VITE_SUPABASE_ANON_KEY || 'your-anon-key';
-const supabase = createClient(supabaseUrl, supabaseKey);
+// Supabase client is centralized in supabaseClient.ts
 
 // Enhanced Chat Types - using types from main types file
 
@@ -33,15 +30,16 @@ export interface SendMessageInput {
 
 export interface ChatRoom {
   id: string;
-  room_type: 'direct' | 'group' | 'society';
+  room_type: 'dm' | 'group' | 'society';
   name: string;
   avatar_url?: string;
   university_id?: string;
   society_id?: string;
   created_by: string;
-  last_message_at?: string;
+  last_message_at: string;
   created_at: string;
   members: ChatMember[];
+  unread_count: number;
   unreadCount: number;
   isOnline: boolean;
   is_typing: TypingUser[];
@@ -85,16 +83,17 @@ class ChatService {
   // Room Management
   async getRooms(): Promise<ChatRoom[]> {
     try {
+      // Primary query (embedded join)
       const { data: rooms, error } = await supabase
         .from('rooms')
         .select(`
-          *,
+          id, room_type, university_id, society_id, name, avatar_url, created_by, last_message_at, created_at,
           room_members!inner(
             user_id,
             role,
             last_read_at,
             joined_at,
-            profiles!inner(
+            profiles:profiles!room_members_user_id_fkey(
               name,
               avatar_url,
               is_online
@@ -103,32 +102,83 @@ class ChatService {
         `)
         .order('last_message_at', { ascending: false });
 
-      if (error) throw error;
+      if (!error && rooms) {
+        return rooms.map((room: any) => ({
+          id: room.id,
+          room_type: room.room_type,
+          name: room.name,
+          avatar_url: room.avatar_url,
+          university_id: room.university_id,
+          society_id: room.society_id,
+          created_by: room.created_by,
+          last_message_at: room.last_message_at || '',
+          created_at: room.created_at || '',
+          members: (room.room_members || []).map((member: any) => ({
+            user_id: member.user_id,
+            name: member.profiles?.name,
+            avatar_url: member.profiles?.avatar_url,
+            role: member.role,
+            last_read_at: member.last_read_at,
+            joined_at: member.joined_at,
+            is_online: Boolean(member.profiles?.is_online)
+          })),
+          unread_count: 0,
+          unreadCount: 0,
+          is_typing: []
+        }));
+      }
 
-      return rooms.map(room => ({
-        id: room.id,
-        room_type: room.room_type,
-        name: room.name,
-        avatar_url: room.avatar_url,
-        university_id: room.university_id,
-        society_id: room.society_id,
-        created_by: room.created_by,
-        last_message_at: room.last_message_at,
-        created_at: room.created_at,
-        members: room.room_members.map(member => ({
-          user_id: member.user_id,
-          name: member.profiles.name,
-          avatar_url: member.profiles.avatar_url,
-          role: member.role,
-          last_read_at: member.last_read_at,
-          joined_at: member.joined_at,
-          is_online: member.profiles.is_online
-        })),
-        unread_count: 0, // Will be calculated separately
-        is_typing: []
-      }));
-    } catch (error) {
-      console.error('Error fetching rooms:', error);
+      // Fallback: two-step fetch to avoid deep embedding issues
+      const currentUser = (await supabase.auth.getUser()).data.user;
+      if (!currentUser) return [];
+      const { data: memberships, error: memErr } = await supabase
+        .from('room_members')
+        .select('room_id')
+        .eq('user_id', currentUser.id);
+      if (memErr || !memberships || memberships.length === 0) return [];
+      const roomIds = memberships.map((m: any) => m.room_id);
+      const { data: baseRooms, error: roomsErr } = await supabase
+        .from('rooms')
+        .select('id, room_type, university_id, society_id, name, avatar_url, created_by, last_message_at, created_at')
+        .in('id', roomIds)
+        .order('last_message_at', { ascending: false });
+      if (roomsErr || !baseRooms) return [];
+
+      // Fetch members per room
+      const results = await Promise.all(
+        baseRooms.map(async (r: any) => {
+          const { data: members } = await supabase
+            .from('room_members')
+            .select('user_id, role, last_read_at, joined_at, profiles(name, avatar_url, is_online)')
+            .eq('room_id', r.id);
+          return {
+            id: r.id,
+            room_type: r.room_type,
+            name: r.name,
+            avatar_url: r.avatar_url,
+            university_id: r.university_id,
+            society_id: r.society_id,
+            created_by: r.created_by,
+            last_message_at: r.last_message_at || '',
+            created_at: r.created_at || '',
+            members: (members || []).map((m: any) => ({
+              user_id: m.user_id,
+              name: m.profiles?.name,
+              avatar_url: m.profiles?.avatar_url,
+              role: m.role,
+              last_read_at: m.last_read_at,
+              joined_at: m.joined_at,
+              is_online: Boolean(m.profiles?.is_online)
+            })),
+            unread_count: 0,
+            unreadCount: 0,
+            is_typing: []
+          } as ChatRoom;
+        })
+      );
+      return results;
+    } catch (error: any) {
+      console.error('Error fetching rooms:', error?.message || error, error?.details || '');
       throw new Error('Failed to fetch chat rooms');
     }
   }
@@ -207,8 +257,8 @@ class ChatService {
         university_id: room.university_id,
         society_id: room.society_id,
         created_by: room.created_by,
-        last_message_at: room.last_message_at,
-        created_at: room.created_at,
+        last_message_at: room.last_message_at || '',
+        created_at: room.created_at || '',
         members: room.room_members.map(member => ({
           user_id: member.user_id,
           name: member.profiles.name,
@@ -219,6 +269,7 @@ class ChatService {
           is_online: member.profiles.is_online
         })),
         unread_count: 0,
+        unreadCount: 0,
         is_typing: []
       };
     } catch (error) {

@@ -129,6 +129,12 @@
   body {
     @apply bg-background text-foreground;
   }
+  a {
+    @apply text-primary hover:underline;
+  }
+  .font-brand {
+    font-family: 'Pacifico', cursive;
+  }
 }
 
 /**

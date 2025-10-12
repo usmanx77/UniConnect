@@ -39,7 +39,7 @@ import { GroupChatManager } from "./GroupChatManager";
 import { ChatSettings } from "./ChatSettings";
 import { ChatNotifications } from "./ChatNotifications";
 import { MobileChatInterface } from "./MobileChatInterface";
-import { EnhancedMessage, ChatRoom } from "../types";
+import type { EnhancedMessage, ChatRoom } from "../lib/services/chatService";
 
 export function ChatPage() {
   const { user } = useAuth();

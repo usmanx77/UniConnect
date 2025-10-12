@@ -265,6 +265,7 @@ export interface AppState {
 // Auth Types
 export interface AuthState {
   isAuthenticated: boolean;
+  isEmailVerified: boolean;
   isOnboarded: boolean;
   user: User | null;
   isLoading: boolean;
@@ -288,7 +289,7 @@ export interface ChatMember {
   name: string;
   avatar_url?: string;
   role: 'member' | 'admin' | 'owner';
-  last_read_at: string;
+  last_read_at?: string;
   joined_at: string;
   is_online: boolean;
 }
@@ -299,6 +300,7 @@ export interface MessageAttachment {
   type: string;
   url: string;
   size: number;
+  filename?: string;
 }
 
 export interface MessageReaction {
@@ -307,6 +309,14 @@ export interface MessageReaction {
   user_name: string;
   emoji: string;
   created_at: string;
+  count?: number;
+  users?: string[];
+}
+
+export interface AggregatedReaction {
+  emoji: string;
+  users: string[];
+  count: number;
 }
 
 export interface EnhancedMessage {
@@ -317,7 +327,7 @@ export interface EnhancedMessage {
   author_avatar?: string;
   body?: string;
   attachments: MessageAttachment[];
-  reactions: MessageReaction[];
+  reactions: (MessageReaction | AggregatedReaction)[];
   reply_to?: string;
   edited_at?: string;
   created_at: string;
@@ -328,7 +338,7 @@ export interface EnhancedMessage {
   senderName: string;
   content: string;
   timestamp: string;
-  read: boolean;
+  read?: boolean;
   type?: "text" | "image" | "file";
   attachmentUrl?: string;
 }
@@ -338,14 +348,14 @@ export interface ChatRoom {
   room_type: 'dm' | 'group' | 'society';
   name?: string;
   avatar_url?: string;
-  university_id: string;
+  university_id?: string;
   society_id?: string;
   created_by: string;
   last_message_at: string;
   created_at: string;
   members: ChatMember[];
-  unread_count: number;
-  is_typing: string[];
+  unread_count?: number;
+  is_typing: any[];
   unreadCount: number;
   isOnline: boolean;
   lastMessage?: ChatMessage;

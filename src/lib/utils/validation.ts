@@ -7,6 +7,17 @@ export const validators = {
     return emailRegex.test(email) && /\.edu\.pk$/i.test(email.split("@")[1] || "");
   },
 
+  username: (username: string): { valid: boolean; message?: string } => {
+    const re = /^[a-zA-Z0-9_]{3,20}$/;
+    if (!re.test(username)) {
+      return {
+        valid: false,
+        message: "Usernames must be 3-20 characters using letters, numbers, or underscores.",
+      };
+    }
+    return { valid: true };
+  },
+
   password: (password: string): { valid: boolean; message?: string } => {
     if (password.length < VALIDATION.MIN_PASSWORD_LENGTH) {
       return {
@@ -67,3 +78,4 @@ export const validators = {
 export function sanitizeInput(input: string): string {
   return input.trim().replace(/[<>]/g, "");
 }
+

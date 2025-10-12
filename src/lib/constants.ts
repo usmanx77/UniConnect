@@ -10,7 +10,7 @@ export const isProduction = typeof process !== 'undefined'
   : import.meta.env?.PROD ?? false;
 
 // App Configuration
-export const APP_NAME = "UniConnect";
+export const APP_NAME = "Campusloif";
 export const APP_VERSION = "1.0.0";
 
 // Storage Keys
@@ -20,6 +20,7 @@ export const STORAGE_KEYS = {
   DARK_MODE: "uniconnect_dark_mode",
   ONBOARDING_COMPLETE: "uniconnect_onboarding_complete",
   AUTH_PERSIST: "uniconnect_auth_persist", // 'local' | 'session'
+  EMAIL_VERIFIED: "uniconnect_email_verified",
 } as const;
 
 // Routes Configuration
@@ -27,7 +28,7 @@ export const ROUTES: Record<PageRoute, { id: PageRoute; label: string; icon: str
   home: { id: "home", label: "Home Feed", icon: "🏠" },
   profile: { id: "profile", label: "My Profile", icon: "👤" },
   connections: { id: "connections", label: "Circle", icon: "👥" },
-  societies: { id: "societies", label: "Societies", icon: "🎯" },
+  societies: { id: "societies", label: "Societies", icon: "🎓" },
   events: { id: "events", label: "Events", icon: "📅" },
   chat: { id: "chat", label: "Messages", icon: "💬" },
   bookmarks: { id: "bookmarks", label: "Bookmarks", icon: "🔖" },
@@ -129,6 +130,7 @@ export const PAKISTANI_UNIVERSITIES: ReadonlyArray<{ name: string; domain: strin
   { name: "Government College University Lahore", domain: "gcu.edu.pk" },
   { name: "NED University of Engineering & Technology", domain: "neduet.edu.pk" },
   { name: "GIKI", domain: "giki.edu.pk" },
+  { name: "Minhaj University Lahore", domain: "mul.edu.pk" },
   { name: "Air University", domain: "au.edu.pk" },
   { name: "Bahria University", domain: "bahria.edu.pk" },
   { name: "UET Peshawar", domain: "uetpeshawar.edu.pk" },

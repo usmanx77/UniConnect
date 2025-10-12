@@ -38,7 +38,7 @@ export function TopNav({ title = "UniConnect", showSearch = false, darkMode, onT
               </AvatarFallback>
             </Avatar>
           </button>
-          <h1 className="hidden sm:block">{title}</h1>
+          <h1 className="hidden sm:block font-brand text-xl text-foreground">{title}</h1>
         </div>
 
         {showSearch && (

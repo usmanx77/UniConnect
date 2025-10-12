@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from "react";
 import type { AuthState, User, LoginCredentials, OnboardingData } from "../types";
 import { authService } from "../lib/services/authService";
+import { supabase } from "../lib/supabaseClient";
 import { STORAGE_KEYS } from "../lib/constants";
 
 interface AuthContextValue extends AuthState {
@@ -15,6 +16,7 @@ const AuthContext = createContext<AuthContextValue | undefined>(undefined);
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [state, setState] = useState<AuthState>({
     isAuthenticated: false,
+    isEmailVerified: false,
     isOnboarded: false,
     user: null,
     isLoading: true,
@@ -41,25 +43,52 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  // Initialize auth state from storage
+  // Initialize auth state from Supabase session (fallback to storage)
   useEffect(() => {
     const initializeAuth = async () => {
       try {
-        const token = getFromStorages(STORAGE_KEYS.AUTH_TOKEN);
-        const userData = getFromStorages(STORAGE_KEYS.USER_DATA);
-        const onboardingComplete = getFromStorages(STORAGE_KEYS.ONBOARDING_COMPLETE);
-
-        if (token && userData) {
-          const user = JSON.parse(userData);
+        const { data } = await supabase.auth.getSession();
+        const session = data.session;
+        const onboardingComplete = getFromStorages(STORAGE_KEYS.ONBOARDING_COMPLETE) === "true";
+        if (session?.user) {
+          const sbUser = session.user;
+          const name = (sbUser.user_metadata?.name || sbUser.user_metadata?.username || sbUser.email?.split("@")[0] || "User") as string;
+          const user: User = {
+            id: sbUser.id,
+            name,
+            email: sbUser.email || "",
+            department: "",
+            batch: "",
+            bio: "",
+            avatar: sbUser.user_metadata?.avatar_url || "",
+            connections: 0,
+            societies: 0,
+          };
           setState({
             isAuthenticated: true,
-            isOnboarded: onboardingComplete === "true",
+            isEmailVerified: Boolean(sbUser.email_confirmed_at),
+            isOnboarded: onboardingComplete,
             user,
             isLoading: false,
             error: null,
           });
         } else {
-          setState(prev => ({ ...prev, isLoading: false }));
+          // fallback to storage-only (e.g., pending verify flow)
+          const userData = getFromStorages(STORAGE_KEYS.USER_DATA);
+          const emailVerified = getFromStorages(STORAGE_KEYS.EMAIL_VERIFIED) === "true";
+          if (userData) {
+            const user = JSON.parse(userData);
+            setState({
+              isAuthenticated: false,
+              isEmailVerified: emailVerified,
+              isOnboarded: onboardingComplete,
+              user,
+              isLoading: false,
+              error: null,
+            });
+          } else {
+            setState(prev => ({ ...prev, isLoading: false }));
+          }
         }
       } catch (error) {
         console.error("Failed to initialize auth:", error);
@@ -68,6 +97,32 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     initializeAuth();
+    const { data: sub } = supabase.auth.onAuthStateChange((_, session) => {
+      const sbUser = session?.user;
+      if (sbUser) {
+        const name = (sbUser.user_metadata?.name || sbUser.user_metadata?.username || sbUser.email?.split("@")[0] || "User") as string;
+        const user: User = {
+          id: sbUser.id,
+          name,
+          email: sbUser.email || "",
+          department: "",
+          batch: "",
+          bio: "",
+          avatar: sbUser.user_metadata?.avatar_url || "",
+          connections: 0,
+          societies: 0,
+        };
+        setState(prev => ({
+          ...prev,
+          isAuthenticated: true,
+          isEmailVerified: Boolean(sbUser.email_confirmed_at),
+          user,
+        }));
+      } else {
+        setState(prev => ({ ...prev, isAuthenticated: false, isEmailVerified: false, user: null }));
+      }
+    });
+    return () => { sub.subscription.unsubscribe(); };
   }, []);
 
   const login = async (credentials: LoginCredentials) => {
@@ -87,9 +142,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       } catch {}
       storage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
       storage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
+      // verification state is driven by Supabase; leave as-is
       
       setState({
         isAuthenticated: true,
+        isEmailVerified: false,
         isOnboarded: false,
         user,
         isLoading: false,
@@ -122,6 +179,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       
       setState({
         isAuthenticated: false,
+        isEmailVerified: false,
         isOnboarded: false,
         user: null,
         isLoading: false,
