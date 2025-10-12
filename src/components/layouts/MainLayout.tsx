@@ -26,50 +26,57 @@ export function MainLayout() {
   const [createPostOpen, setCreatePostOpen] = useState(false);
 
   return (
-    <div className="min-h-screen bg-background">
-      <TopNav
-        title={APP_NAME}
-        showSearch={currentPage === "home"}
-        darkMode={darkMode}
-        onToggleDarkMode={toggleDarkMode}
-        onSearchClick={() => navigate("search")}
+    <div className="relative min-h-screen overflow-hidden">
+      <div
+        aria-hidden="true"
+        className="pointer-events-none absolute inset-0 bg-[radial-gradient(1100px_circle_at_20%_-20%,rgba(10,132,255,0.18),transparent_55%),radial-gradient(900px_circle_at_90%_0%,rgba(94,92,230,0.14),transparent_50%)]"
       />
 
-      <Sidebar />
+      <div className="relative min-h-screen bg-white/40 backdrop-blur-[2px] dark:bg-black/60">
+        <TopNav
+          title={APP_NAME}
+          showSearch={currentPage === "home"}
+          darkMode={darkMode}
+          onToggleDarkMode={toggleDarkMode}
+          onSearchClick={() => navigate("search")}
+        />
 
-      <main className="md:ml-64 pt-[60px] md:pt-0">
-        <Suspense fallback={<LoadingSpinner fullScreen size="lg" text="Loading page..." />}>
-          {currentPage === "home" && (
-            <HomePage onOpenCreatePost={() => setCreatePostOpen(true)} />
-          )}
-          {currentPage === "profile" && <ProfilePage />}
-          {currentPage === "connections" && <ConnectionsPage />}
-          {currentPage === "societies" && <SocietiesPage />}
-          {currentPage === "society-room" && <SocietyRoomPage />}
-          {currentPage === "events" && <EventsPage />}
-          {currentPage === "chat" && <ChatPage />}
-          {currentPage === "bookmarks" && <BookmarksPage />}
-          {currentPage === "search" && <AdvancedSearchPage />}
-          {currentPage === "settings" && <SettingsPage />}
-        </Suspense>
-      </main>
+        <Sidebar />
 
-      <BottomNav />
+        <main className="md:ml-64 pt-[60px] md:pt-0">
+          <Suspense fallback={<LoadingSpinner fullScreen size="lg" text="Loading page..." />}>
+            {currentPage === "home" && (
+              <HomePage onOpenCreatePost={() => setCreatePostOpen(true)} />
+            )}
+            {currentPage === "profile" && <ProfilePage />}
+            {currentPage === "connections" && <ConnectionsPage />}
+            {currentPage === "societies" && <SocietiesPage />}
+            {currentPage === "society-room" && <SocietyRoomPage />}
+            {currentPage === "events" && <EventsPage />}
+            {currentPage === "chat" && <ChatPage />}
+            {currentPage === "bookmarks" && <BookmarksPage />}
+            {currentPage === "search" && <AdvancedSearchPage />}
+            {currentPage === "settings" && <SettingsPage />}
+          </Suspense>
+        </main>
 
-      {/* Floating Action Button for Quick Post */}
-      {currentPage === "home" && (
-        <Button
-          size="icon"
-          onClick={() => setCreatePostOpen(true)}
-          className="fixed bottom-[88px] right-6 md:bottom-6 md:right-6 w-14 h-14 rounded-full shadow-lg shadow-primary/30 z-40"
-          aria-label="Create new post"
-        >
-          <Plus className="h-6 w-6" />
-        </Button>
-      )}
+        <BottomNav />
 
-      {/* Create Post Dialog */}
-      <CreatePostDialog open={createPostOpen} onOpenChange={setCreatePostOpen} />
+        {/* Floating Action Button for Quick Post */}
+        {currentPage === "home" && (
+          <Button
+            size="icon"
+            onClick={() => setCreatePostOpen(true)}
+            className="fixed bottom-[88px] right-6 md:bottom-6 md:right-6 w-14 h-14 rounded-full bg-gradient-to-br from-primary to-primary/70 shadow-[0_25px_45px_-20px_rgba(10,132,255,0.55)] transition-transform hover:scale-[1.02] focus-visible:scale-[1.02]"
+            aria-label="Create new post"
+          >
+            <Plus className="h-6 w-6" />
+          </Button>
+        )}
+
+        {/* Create Post Dialog */}
+        <CreatePostDialog open={createPostOpen} onOpenChange={setCreatePostOpen} />
+      </div>
     </div>
   );
 }

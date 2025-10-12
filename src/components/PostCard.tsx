@@ -79,24 +79,24 @@ export function PostCard({ post }: {
     <motion.div
       initial={{ opacity: 0, y: 20 }}
       animate={{ opacity: 1, y: 0 }}
-      className="bg-card rounded-lg border border-border shadow-sm hover:shadow-md transition-shadow mb-4"
+      className="relative mb-6 overflow-hidden rounded-3xl border border-white/60 bg-white/70 shadow-[0_28px_75px_-40px_rgba(15,23,42,0.55)] backdrop-blur-xl transition-all hover:-translate-y-1 hover:shadow-[0_32px_90px_-45px_rgba(15,23,42,0.65)] dark:border-white/10 dark:bg-white/10"
     >
-      <div className="p-4">
-        <div className="flex items-start justify-between mb-3">
-          <div className="flex items-start gap-3">
-            <Avatar className="w-10 h-10">
+      <div className="p-6">
+        <div className="mb-4 flex items-start justify-between">
+          <div className="flex items-start gap-4">
+            <Avatar className="h-12 w-12">
               <AvatarImage src={post.avatar} />
-              <AvatarFallback className="bg-primary text-white">
+              <AvatarFallback className="text-sm font-semibold text-foreground">
                 {post.author.charAt(0)}
               </AvatarFallback>
             </Avatar>
             <div className="flex-1">
               <div className="flex items-center gap-2">
-                <h4 className="text-sm font-semibold text-foreground">{post.author}</h4>
+                <h4 className="text-base font-semibold text-foreground">{post.author}</h4>
                 <span className="text-xs text-muted-foreground">•</span>
                 <span className="text-xs text-muted-foreground">{post.timeAgo}</span>
               </div>
-              <p className="text-xs text-muted-foreground">
+              <p className="text-sm text-muted-foreground">
                 {post.department} • {post.batch}
               </p>
             </div>
@@ -106,33 +106,37 @@ export function PostCard({ post }: {
               variant="ghost"
               size="icon"
               onClick={handleBookmark}
-              className={`rounded-full h-8 w-8 hover:bg-accent ${isBookmarked ? "text-primary" : "text-muted-foreground"}`}
+              className={`h-9 w-9 rounded-full border border-transparent bg-white/40 text-muted-foreground transition hover:border-white/60 hover:bg-white/70 dark:bg-white/10 dark:hover:bg-white/20 ${isBookmarked ? "text-primary" : ""}`}
             >
               <Bookmark className={`h-4 w-4 ${isBookmarked ? "fill-current" : ""}`} />
             </Button>
-            <Button variant="ghost" size="icon" className="rounded-full h-8 w-8 hover:bg-accent text-muted-foreground">
+            <Button variant="ghost" size="icon" className="h-9 w-9 rounded-full border border-transparent bg-white/40 text-muted-foreground transition hover:border-white/60 hover:bg-white/70 dark:bg-white/10 dark:hover:bg-white/20">
               <MoreHorizontal className="h-4 w-4" />
             </Button>
           </div>
         </div>
 
-        <p className="mb-3 text-sm leading-relaxed text-foreground whitespace-pre-wrap">{post.content}</p>
+        <p className="mb-4 text-base leading-relaxed text-foreground/90 whitespace-pre-wrap">
+          {post.content}
+        </p>
 
         {/* Poll Widget */}
         {post.poll && <PollWidget poll={post.poll} className="mb-3" />}
 
         {/* Images */}
         {images.length > 0 && (
-          <div className={`mb-3 rounded-lg overflow-hidden grid gap-1 ${
+          <div
+            className={`mb-5 grid overflow-hidden rounded-2xl border border-white/50 bg-white/40 backdrop-blur dark:border-white/10 dark:bg-white/5 ${
             images.length === 1 ? "grid-cols-1" :
             images.length === 2 ? "grid-cols-2" :
             images.length === 3 ? "grid-cols-3" :
             "grid-cols-2"
-          }`}>
+          }`}
+          >
             {images.slice(0, 4).map((img, idx) => (
               <div
                 key={idx}
-                className={`relative cursor-pointer overflow-hidden ${
+                className={`relative cursor-pointer overflow-hidden transition-all hover:brightness-[1.03] ${
                   images.length === 3 && idx === 0 ? "col-span-3" : ""
                 } ${images.length > 4 && idx === 3 ? "relative" : ""}`}
                 onClick={() => {
@@ -144,7 +148,7 @@ export function PostCard({ post }: {
                   whileHover={{ scale: 1.02 }}
                   src={img}
                   alt={`Post image ${idx + 1}`}
-                  className="w-full h-48 object-cover"
+                  className="h-56 w-full object-cover"
                 />
                 {images.length > 4 && idx === 3 && (
                   <div className="absolute inset-0 bg-black/60 flex items-center justify-center">
@@ -158,14 +162,14 @@ export function PostCard({ post }: {
 
       {/* Attachments */}
       {post.attachments && post.attachments.length > 0 && (
-        <div className="mb-3 space-y-2">
+        <div className="mb-4 space-y-2">
           {post.attachments.map((attachment) => (
             <div
               key={attachment.id}
-              className="flex items-center gap-3 p-3 bg-accent rounded-xl"
+              className="flex items-center gap-3 rounded-2xl border border-white/60 bg-white/50 p-3 backdrop-blur dark:border-white/10 dark:bg-white/10"
             >
-              <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center flex-shrink-0">
-                <span className="text-xs text-primary">
+              <div className="flex h-10 w-10 flex-shrink-0 items-center justify-center rounded-xl bg-primary/10">
+                <span className="text-xs font-semibold text-primary">
                   {attachment.type.split("/")[1]?.toUpperCase()}
                 </span>
               </div>
@@ -182,28 +186,28 @@ export function PostCard({ post }: {
 
         {/* Reaction Summary */}
         {totalReactions > 0 && (
-          <div className="flex items-center justify-between mb-3 pb-3 border-b border-border">
-            <div className="flex items-center gap-2">
+          <div className="mb-4 flex items-center justify-between border-b border-white/50 pb-4 dark:border-white/10">
+            <div className="flex items-center gap-3">
               <div className="flex -space-x-1">
                 {topReactions.map(([type]) => {
                   const Icon = reactionIcons[type as ReactionType];
                   return (
                     <div
                       key={type}
-                      className="w-5 h-5 rounded-full bg-primary/10 border border-primary/20 flex items-center justify-center"
+                      className="flex h-6 w-6 items-center justify-center rounded-full border border-white/70 bg-white/80 shadow-sm dark:border-white/20 dark:bg-white/10"
                     >
                       <Icon
-                        className="h-3 w-3"
+                        className="h-3.5 w-3.5"
                         style={{ color: reactionColors[type as ReactionType] }}
                       />
                     </div>
                   );
                 })}
               </div>
-              <span className="text-sm text-muted-foreground">{totalReactions}</span>
+              <span className="text-sm font-medium text-muted-foreground">{totalReactions}</span>
             </div>
             {post.comments !== undefined && post.comments > 0 && (
-              <span className="text-sm text-muted-foreground hover:underline cursor-pointer">
+              <span className="cursor-pointer text-sm font-medium text-muted-foreground transition hover:text-foreground">
                 {post.comments} comments
               </span>
             )}
@@ -211,13 +215,13 @@ export function PostCard({ post }: {
         )}
 
         {/* Actions */}
-        <div className="flex items-center justify-between px-2">
+        <div className="flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
           <ReactionPicker onReact={handleReaction} currentReaction={userReaction} />
-          <Button variant="ghost" size="sm" className="rounded-lg gap-2 flex-1 hover:bg-accent">
+          <Button variant="ghost" size="sm" className="flex-1 rounded-full border border-transparent bg-white/50 px-4 py-2 font-semibold text-muted-foreground transition hover:bg-white/80 hover:text-primary dark:bg-white/10 dark:hover:bg-white/20">
             <MessageCircle className="h-4 w-4" />
             <span className="text-sm font-medium">Comment</span>
           </Button>
-          <Button variant="ghost" size="sm" className="rounded-lg gap-2 hover:bg-accent">
+          <Button variant="ghost" size="sm" className="rounded-full border border-transparent bg-white/50 px-4 py-2 font-semibold text-muted-foreground transition hover:bg-white/80 hover:text-primary dark:bg-white/10 dark:hover:bg-white/20">
             <Share2 className="h-4 w-4" />
             <span className="text-sm font-medium">Share</span>
           </Button>

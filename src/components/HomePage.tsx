@@ -169,84 +169,120 @@ export function HomePage({ onOpenCreatePost }: HomePageProps) {
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
-      <div className="max-w-6xl mx-auto px-4 pt-4 pb-20 md:pb-6">
+      <div className="relative z-10 max-w-6xl mx-auto px-4 sm:px-6 lg:px-8 pt-8 pb-24 md:pb-12">
+        <div className="mb-10 flex flex-col gap-6 md:flex-row md:items-center md:justify-between">
+          <div className="space-y-2">
+            <p className="text-xs font-medium uppercase tracking-[0.4em] text-muted-foreground/70">
+              UniConnect
+            </p>
+            <h1 className="text-3xl sm:text-4xl font-semibold text-foreground">
+              A refined way to experience campus life.
+            </h1>
+            <p className="max-w-xl text-sm text-muted-foreground">
+              Discover conversations, events and people through a serene, minimalist surface inspired by the smooth polish of
+              Apple design principles.
+            </p>
+          </div>
+          <div className="flex items-center gap-3">
+            <Button
+              onClick={onOpenCreatePost}
+              className="rounded-full bg-gradient-to-r from-primary to-primary/80 px-6 py-2 text-sm font-semibold shadow-[0_20px_45px_-25px_rgba(10,132,255,0.7)] transition-transform hover:-translate-y-0.5"
+            >
+              Compose a Story
+            </Button>
+            <Button
+              variant="outline"
+              className="rounded-full border-white/60 bg-white/50 px-6 py-2 text-sm font-semibold text-foreground backdrop-blur dark:border-white/10 dark:bg-white/10"
+            >
+              Explore Insights
+            </Button>
+          </div>
+        </div>
+
         {/* Stories Bar */}
-        <div className="mb-4">
+        <div className="mb-8">
           <StoriesBar />
         </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
-            {/* Main Feed */}
-            <div className="lg:col-span-2 space-y-4">
-              <PostComposer onOpenCreatePost={onOpenCreatePost} />
-              
-              {posts.map((post, index) => (
-                <motion.div
-                  key={post.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.05 }}
-                >
-                  <PostCard post={post} />
-                </motion.div>
-              ))}
 
-              {/* Infinite Scroll Trigger */}
-              <div ref={targetRef} className="py-4">
-                {isLoadingMore && (
-                  <div className="space-y-4">
-                    <Card className="p-4 rounded-2xl">
-                      <div className="flex items-start gap-3 mb-3">
-                        <Skeleton className="w-10 h-10 rounded-full" />
-                        <div className="flex-1 space-y-2">
-                          <Skeleton className="h-4 w-32" />
-                          <Skeleton className="h-3 w-48" />
-                        </div>
-                      </div>
-                      <Skeleton className="h-20 w-full mb-3" />
-                      <Skeleton className="h-48 w-full rounded-xl" />
-                    </Card>
-                  </div>
-                )}
-              </div>
-            </div>
+        <div className="grid grid-cols-1 gap-6 lg:grid-cols-3">
+          {/* Main Feed */}
+          <div className="space-y-6 lg:col-span-2">
+            <PostComposer onOpenCreatePost={onOpenCreatePost} />
 
-            {/* Sidebar */}
-            <div className="hidden lg:block space-y-4">
-              {/* Suggested Connections */}
+            {posts.map((post, index) => (
               <motion.div
-                initial={{ opacity: 0, x: 20 }}
-                animate={{ opacity: 1, x: 0 }}
-                className="bg-card rounded-lg border border-border p-4 shadow-sm sticky top-[92px]"
+                key={post.id}
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: index * 0.05 }}
               >
+                <PostCard post={post} />
+              </motion.div>
+            ))}
+
+            {/* Infinite Scroll Trigger */}
+            <div ref={targetRef} className="py-4">
+              {isLoadingMore && (
+                <div className="space-y-4">
+                  <Card className="rounded-3xl border border-white/60 bg-white/70 p-6 shadow-[0_24px_60px_-35px_rgba(15,23,42,0.45)] backdrop-blur-xl dark:border-white/10 dark:bg-white/10">
+                    <div className="mb-4 flex items-start gap-3">
+                      <Skeleton className="h-10 w-10 rounded-full" />
+                      <div className="flex-1 space-y-2">
+                        <Skeleton className="h-4 w-32" />
+                        <Skeleton className="h-3 w-48" />
+                      </div>
+                    </div>
+                    <Skeleton className="mb-4 h-20 w-full rounded-2xl" />
+                    <Skeleton className="h-48 w-full rounded-2xl" />
+                  </Card>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Sidebar */}
+          <div className="hidden space-y-6 lg:block">
+            {/* Suggested Connections */}
+            <motion.div
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              className="sticky top-[92px] rounded-3xl border border-white/60 bg-white/70 p-6 shadow-[0_24px_60px_-35px_rgba(15,23,42,0.35)] backdrop-blur-xl dark:border-white/10 dark:bg-white/10"
+            >
                 <div className="flex items-center gap-2 mb-4">
                   <Users className="h-5 w-5 text-primary" />
                   <h3 className="text-sm font-semibold text-foreground">People You May Know</h3>
                 </div>
-                <div className="space-y-3">
+                <div className="space-y-4">
                   {suggestedConnections.map((connection) => (
-                    <div key={connection.id} className="flex items-start gap-3">
-                      <Avatar className="w-10 h-10">
-                        <AvatarFallback className="bg-primary text-white text-xs">
+                    <div key={connection.id} className="flex items-start gap-4 rounded-2xl border border-white/50 bg-white/40 p-3 backdrop-blur dark:border-white/10 dark:bg-white/5">
+                      <Avatar className="h-12 w-12">
+                        <AvatarFallback className="text-xs font-semibold text-foreground">
                           {connection.name[0]}
                         </AvatarFallback>
                       </Avatar>
-                      <div className="flex-1 min-w-0">
-                        <h4 className="text-sm font-medium truncate text-foreground">{connection.name}</h4>
-                        <p className="text-xs text-muted-foreground truncate">
+                      <div className="min-w-0 flex-1">
+                        <h4 className="truncate text-sm font-semibold text-foreground">{connection.name}</h4>
+                        <p className="truncate text-xs text-muted-foreground">
                           {connection.department}
                         </p>
                         <p className="text-xs text-muted-foreground">
                           {connection.mutualConnections} mutual connections
                         </p>
                       </div>
-                      <Button size="sm" variant="outline" className="rounded-lg flex-shrink-0 text-xs px-3 py-1">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        className="flex-shrink-0 rounded-full border-white/60 bg-white/60 px-4 py-2 text-xs font-semibold text-foreground dark:border-white/15 dark:bg-white/10"
+                      >
                         Connect
                       </Button>
                     </div>
                   ))}
                 </div>
-                <Button variant="ghost" className="w-full mt-4 rounded-lg text-sm text-primary hover:bg-accent">
+                <Button
+                  variant="ghost"
+                  className="mt-6 w-full rounded-full border border-transparent bg-white/60 py-2 text-sm font-semibold text-primary transition hover:bg-white/80 dark:bg-white/10 dark:hover:bg-white/20"
+                >
                   View All Suggestions
                 </Button>
               </motion.div>
@@ -256,7 +292,7 @@ export function HomePage({ onOpenCreatePost }: HomePageProps) {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.1 }}
-                className="bg-card rounded-lg border border-border p-4 shadow-sm"
+                className="rounded-3xl border border-white/60 bg-white/70 p-6 shadow-[0_24px_60px_-35px_rgba(15,23,42,0.35)] backdrop-blur-xl dark:border-white/10 dark:bg-white/10"
               >
                 <div className="flex items-center gap-2 mb-4">
                   <Calendar className="h-5 w-5 text-primary" />
@@ -264,8 +300,11 @@ export function HomePage({ onOpenCreatePost }: HomePageProps) {
                 </div>
                 <div className="space-y-3">
                   {upcomingEvents.map((event, i) => (
-                    <div key={i} className="relative p-3 bg-gradient-to-r rounded-lg overflow-hidden group cursor-pointer hover:bg-accent/50 transition-colors">
-                      <div className={`absolute inset-0 bg-gradient-to-r ${event.color} opacity-5 group-hover:opacity-10 transition-opacity`} />
+                    <div
+                      key={i}
+                      className="group relative cursor-pointer overflow-hidden rounded-2xl bg-gradient-to-r from-white/50 via-white/40 to-white/30 p-3 transition-all hover:-translate-y-0.5 hover:bg-white/60 dark:from-white/10 dark:via-white/5 dark:to-white/0"
+                    >
+                      <div className={`absolute inset-0 bg-gradient-to-r ${event.color} opacity-5 transition-opacity group-hover:opacity-10`} />
                       <div className="relative">
                         <h4 className="text-sm font-medium mb-1 text-foreground">{event.title}</h4>
                         <p className="text-xs text-muted-foreground">
@@ -275,7 +314,10 @@ export function HomePage({ onOpenCreatePost }: HomePageProps) {
                     </div>
                   ))}
                 </div>
-                <Button variant="ghost" className="w-full mt-4 rounded-lg text-sm text-primary hover:bg-accent">
+                <Button
+                  variant="ghost"
+                  className="mt-6 w-full rounded-full border border-transparent bg-white/60 py-2 text-sm font-semibold text-primary transition hover:bg-white/80 dark:bg-white/10 dark:hover:bg-white/20"
+                >
                   View All Events
                 </Button>
               </motion.div>
@@ -285,7 +327,7 @@ export function HomePage({ onOpenCreatePost }: HomePageProps) {
                 initial={{ opacity: 0, x: 20 }}
                 animate={{ opacity: 1, x: 0 }}
                 transition={{ delay: 0.2 }}
-                className="bg-card rounded-lg border border-border p-4 shadow-sm"
+                className="rounded-3xl border border-white/60 bg-white/70 p-6 shadow-[0_24px_60px_-35px_rgba(15,23,42,0.35)] backdrop-blur-xl dark:border-white/10 dark:bg-white/10"
               >
                 <div className="flex items-center gap-2 mb-4">
                   <TrendingUp className="h-5 w-5 text-primary" />
@@ -295,7 +337,7 @@ export function HomePage({ onOpenCreatePost }: HomePageProps) {
                   {trendingTopics.map((topic, i) => (
                     <button
                       key={i}
-                      className="block w-full text-left px-3 py-2 rounded-lg hover:bg-accent transition-colors group"
+                      className="group block w-full rounded-2xl border border-transparent bg-white/40 px-4 py-3 text-left transition-all hover:-translate-y-0.5 hover:border-white/70 hover:bg-white/70 dark:bg-white/5 dark:hover:border-white/15 dark:hover:bg-white/10"
                     >
                       <div className="flex items-center justify-between">
                         <p className="text-sm font-medium text-primary group-hover:underline">{topic.tag}</p>

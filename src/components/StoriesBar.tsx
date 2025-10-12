@@ -20,22 +20,22 @@ export function StoriesBar() {
 
   return (
     <>
-      <div className="bg-card border border-border rounded-lg shadow-sm">
+      <div className="rounded-3xl border border-white/60 bg-white/70 p-4 shadow-[0_24px_60px_-35px_rgba(15,23,42,0.35)] backdrop-blur-xl dark:border-white/10 dark:bg-white/10">
         <ScrollArea className="w-full">
-          <div className="flex gap-4 p-4 overflow-x-auto">
+          <div className="flex gap-5 overflow-x-auto px-1 py-1">
             {/* Add Story Button */}
             <motion.button
               whileHover={{ scale: 1.05 }}
               whileTap={{ scale: 0.95 }}
               onClick={() => setCreateStoryOpen(true)}
-              className="flex-shrink-0 flex flex-col items-center gap-2 group"
+              className="group flex shrink-0 flex-col items-center gap-2"
             >
               <div className="relative">
-                <div className="w-16 h-16 rounded-full bg-gradient-to-br from-primary to-purple-600 flex items-center justify-center">
-                  <Plus className="h-6 w-6 text-white" />
+                <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-gradient-to-br from-primary via-primary/80 to-primary/60 shadow-[0_20px_45px_-30px_rgba(10,132,255,0.8)] dark:shadow-[0_20px_45px_-28px_rgba(100,210,255,0.35)]">
+                  <Plus className="h-6 w-6 text-primary-foreground" />
                 </div>
               </div>
-              <span className="text-xs text-center max-w-[64px] truncate">Your Story</span>
+              <span className="max-w-[72px] text-center text-xs font-medium text-muted-foreground">Your Story</span>
             </motion.button>
 
             {/* Story Groups */}
@@ -45,26 +45,26 @@ export function StoriesBar() {
                 whileHover={{ scale: 1.05 }}
                 whileTap={{ scale: 0.95 }}
                 onClick={() => handleStoryClick(index)}
-                className="flex-shrink-0 flex flex-col items-center gap-2"
+                className="flex shrink-0 flex-col items-center gap-2"
               >
                 <div className="relative">
                   <div
                     className={`p-0.5 rounded-full ${
                       group.hasUnviewed
-                        ? "bg-gradient-to-br from-primary via-purple-500 to-pink-500"
-                        : "bg-gray-300 dark:bg-gray-600"
+                        ? "bg-gradient-to-br from-primary via-primary/70 to-primary/40"
+                        : "bg-muted"
                     }`}
                   >
-                    <div className="bg-card rounded-full p-0.5">
-                      <Avatar className="w-14 h-14">
-                        <AvatarFallback className="bg-primary text-white">
+                    <div className="rounded-[1.75rem] bg-white/70 p-0.5 backdrop-blur dark:bg-white/10">
+                      <Avatar className="h-14 w-14">
+                        <AvatarFallback className="text-sm font-semibold text-foreground">
                           {group.userName[0]}
                         </AvatarFallback>
                       </Avatar>
                     </div>
                   </div>
                 </div>
-                <span className="text-xs text-center max-w-[64px] truncate">
+                <span className="max-w-[72px] text-center text-xs font-medium text-muted-foreground">
                   {group.userName.split(" ")[0]}
                 </span>
               </motion.button>

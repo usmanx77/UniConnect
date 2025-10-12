@@ -31,7 +31,7 @@ export function ReactionPicker({ onReact, currentReaction }: ReactionPickerProps
             onReact("like");
           }
         }}
-        className="flex items-center gap-1 px-3 py-1.5 rounded-xl hover:bg-accent transition-colors"
+        className="flex items-center gap-2 rounded-full border border-transparent bg-white/50 px-4 py-2 text-sm font-semibold text-muted-foreground transition hover:bg-white/80 hover:text-primary dark:bg-white/10 dark:hover:bg-white/20"
       >
         {currentReaction ? (
           <>
@@ -63,7 +63,7 @@ export function ReactionPicker({ onReact, currentReaction }: ReactionPickerProps
             transition={{ duration: 0.2 }}
             onMouseEnter={() => setIsOpen(true)}
             onMouseLeave={() => setIsOpen(false)}
-            className="absolute bottom-full left-0 mb-2 bg-card border border-border rounded-2xl shadow-lg p-2 flex gap-2 z-50"
+            className="absolute bottom-full left-0 z-50 mb-2 flex gap-2 rounded-3xl border border-white/60 bg-white/80 p-3 shadow-[0_20px_45px_-30px_rgba(15,23,42,0.45)] backdrop-blur-xl dark:border-white/10 dark:bg-white/10"
           >
             {reactions.map((reaction) => (
               <motion.button
@@ -74,7 +74,7 @@ export function ReactionPicker({ onReact, currentReaction }: ReactionPickerProps
                   onReact(reaction.type);
                   setIsOpen(false);
                 }}
-                className="flex flex-col items-center gap-1 p-2 rounded-xl hover:bg-accent transition-colors"
+                className="flex flex-col items-center gap-2 rounded-2xl border border-transparent bg-white/70 px-3 py-2 text-xs font-medium text-muted-foreground transition hover:-translate-y-0.5 hover:border-white/80 hover:bg-white dark:bg-white/10 dark:hover:bg-white/20"
                 title={reaction.label}
               >
                 <reaction.icon className="h-6 w-6" style={{ color: reaction.color }} />
