@@ -7,6 +7,7 @@ import { VerifyEmailPage } from "./VerifyEmailPage";
 import { ResetPasswordPage } from "./ResetPasswordPage";
 import { MainLayout } from "./layouts/MainLayout";
 import { LoadingSpinner } from "./LoadingSpinner";
+import { STORAGE_KEYS } from "../lib/constants";
 
 export function AppRouter() {
   const { isAuthenticated, isEmailVerified, isOnboarded, isLoading: authLoading } = useAuth();
@@ -14,8 +15,8 @@ export function AppRouter() {
   // Pending email verification after signup (no session yet)
   let pendingVerify = false;
   try {
-    const rawUser = localStorage.getItem('uniconnect_user_data') || sessionStorage.getItem('uniconnect_user_data');
-    const emailVerified = localStorage.getItem('uniconnect_email_verified');
+    const rawUser = localStorage.getItem(STORAGE_KEYS.USER_DATA) || sessionStorage.getItem(STORAGE_KEYS.USER_DATA);
+    const emailVerified = localStorage.getItem(STORAGE_KEYS.EMAIL_VERIFIED) || sessionStorage.getItem(STORAGE_KEYS.EMAIL_VERIFIED);
     pendingVerify = Boolean(rawUser) && emailVerified === 'false';
   } catch {}
 

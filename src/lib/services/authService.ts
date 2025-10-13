@@ -42,12 +42,6 @@ class AuthService {
       connections: 0,
       societies: 0,
     };
-    try {
-      const verified = Boolean(sbUser.email_confirmed_at);
-      const storage = localStorage;
-      storage.setItem(STORAGE_KEYS.EMAIL_VERIFIED, verified ? "true" : "false");
-      storage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify({ email: user.email }));
-    } catch {}
     return { user, token };
   }
 
@@ -84,7 +78,6 @@ class AuthService {
       localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify({ email }));
     } catch {}
   }
-
 
   // Check username availability against DB (profiles.username)
   async checkUsernameAvailability(username: string): Promise<boolean> {
@@ -182,11 +175,6 @@ class AuthService {
       connections: 0,
       societies: 0,
     };
-    try {
-      const storage = localStorage;
-      storage.setItem(STORAGE_KEYS.ONBOARDING_COMPLETE, 'true');
-      storage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(updatedUser));
-    } catch {}
 
     return updatedUser;
   }

@@ -1,8 +1,8 @@
 import type { PageRoute } from "../types";
 
 // Environment helpers
-export const isDevelopment = typeof process !== 'undefined' 
-  ? process.env?.NODE_ENV === 'development' 
+export const isDevelopment = typeof process !== 'undefined'
+  ? process.env?.NODE_ENV === 'development'
   : import.meta.env?.DEV ?? true;
 
 export const isProduction = typeof process !== 'undefined'
@@ -118,7 +118,7 @@ export const ERROR_MESSAGES = {
   UNAUTHORIZED: "You are not authorized to perform this action.",
   NOT_FOUND: "The requested resource was not found.",
   VALIDATION_ERROR: "Please check your input and try again.",
-} as const;
+};
 
 // Success Messages
 export const SUCCESS_MESSAGES = {

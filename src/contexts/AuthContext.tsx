@@ -26,13 +26,19 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const getFromStorages = (key: string): string | null => {
     try {
-      const fromSession = typeof window !== 'undefined' ? sessionStorage.getItem(key) : null;
-      if (fromSession) return fromSession;
-      return typeof window !== 'undefined' ? localStorage.getItem(key) : null;
+      // First check the active storage (where auth token is stored)
+      const activeStorage = getActiveStorage();
+      const fromActive = activeStorage.getItem(key);
+      if (fromActive) return fromActive;
+
+      // Fallback to the other storage
+      const otherStorage = activeStorage === sessionStorage ? localStorage : sessionStorage;
+      return otherStorage.getItem(key);
     } catch {
       return null;
     }
   };
+
 
   const getActiveStorage = (): Storage => {
     try {
@@ -50,7 +56,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       try {
         const { data } = await supabase.auth.getSession();
         const session = data.session;
-        const onboardingComplete = getFromStorages(STORAGE_KEYS.ONBOARDING_COMPLETE) === "true";
+        // Determine active storage based on where auth token is stored
+        const activeStorage = getActiveStorage();
+        const onboardingComplete = activeStorage.getItem(STORAGE_KEYS.ONBOARDING_COMPLETE) === "true";
         if (session?.user) {
           const sbUser = session.user;
           const name = (sbUser.user_metadata?.name || sbUser.user_metadata?.username || sbUser.email?.split("@")[0] || "User") as string;
@@ -75,8 +83,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           });
         } else {
           // fallback to storage-only (e.g., pending verify flow)
-          const userData = getFromStorages(STORAGE_KEYS.USER_DATA);
-          const emailVerified = getFromStorages(STORAGE_KEYS.EMAIL_VERIFIED) === "true";
+          const userData = activeStorage.getItem(STORAGE_KEYS.USER_DATA);
+          const emailVerified = activeStorage.getItem(STORAGE_KEYS.EMAIL_VERIFIED) === "true";
           if (userData) {
             const user = JSON.parse(userData);
             setState({
@@ -98,6 +106,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     initializeAuth();
+
     const { data: sub } = supabase.auth.onAuthStateChange((_, session) => {
       const sbUser = session?.user;
       if (sbUser) {
@@ -151,7 +160,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       // derive verification status from Supabase session
       const { data: sessionData } = await supabase.auth.getSession();
       const verified = Boolean(sessionData.session?.user?.email_confirmed_at);
-      const onboardingComplete = getFromStorages(STORAGE_KEYS.ONBOARDING_COMPLETE) === "true";
+      const activeStorage = getActiveStorage();
+      const onboardingComplete = activeStorage.getItem(STORAGE_KEYS.ONBOARDING_COMPLETE) === "true";
       setState({
         isAuthenticated: true,
         isEmailVerified: verified,
@@ -160,6 +170,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         isLoading: false,
         error: null,
       });
+
     } catch (error) {
       setState(prev => ({
         ...prev,
@@ -187,9 +198,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         connections: 0,
         societies: 0,
       };
+      // Use active storage for consistency (will be localStorage initially)
+      const storage = getActiveStorage();
       try {
-        localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(tempUser));
-        localStorage.setItem(STORAGE_KEYS.EMAIL_VERIFIED, "false");
+        storage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(tempUser));
+        storage.setItem(STORAGE_KEYS.EMAIL_VERIFIED, "false");
       } catch {}
       setState({
         isAuthenticated: false,
@@ -216,6 +229,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       throw error;
     }
   };
+
 
   const logout = async () => {
     setState(prev => ({ ...prev, isLoading: true }));

@@ -34,7 +34,10 @@ export function VerifyEmailPage() {
 
   const markVerified = () => {
     try {
-      localStorage.setItem(STORAGE_KEYS.EMAIL_VERIFIED, "true");
+      // Use the same storage where user data is stored
+      const userData = localStorage.getItem(STORAGE_KEYS.USER_DATA) || sessionStorage.getItem(STORAGE_KEYS.USER_DATA);
+      const storage = userData && sessionStorage.getItem(STORAGE_KEYS.USER_DATA) ? sessionStorage : localStorage;
+      storage.setItem(STORAGE_KEYS.EMAIL_VERIFIED, "true");
       // Reload to let the router advance to onboarding
       window.location.reload();
     } catch {}
@@ -48,7 +51,7 @@ export function VerifyEmailPage() {
         <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
         <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"></div>
       </div>
-      
+
       <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-slate-200 dark:border-slate-700 p-8 max-w-md w-full text-center relative z-10">
         <h1 className="text-3xl font-bold mb-2 text-primary">Welcome to <span className="font-brand text-primary">{APP_NAME}</span>!</h1>
         <p className="text-slate-600 dark:text-slate-400 mb-6 font-medium">
@@ -67,9 +70,3 @@ export function VerifyEmailPage() {
     </div>
   );
 }
-
-
-
-
-
-
