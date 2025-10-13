@@ -1,30 +1,70 @@
 import { VALIDATION } from "../constants";
 
 export const validators = {
-  email: (email: string): boolean => {
+  email: (email: string): { valid: boolean; message?: string } => {
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-    // Restrict to Pakistani university domains ending with .edu.pk
-    return emailRegex.test(email) && /\.edu\.pk$/i.test(email.split("@")[1] || "");
+    const domain = email.split("@")[1] || "";
+
+    if (!email.trim()) {
+      return { valid: false, message: "Email required!" };
+    }
+
+    if (!emailRegex.test(email)) {
+      return { valid: false, message: "Invalid email format" };
+    }
+
+    if (!/\.edu\.pk$/i.test(domain)) {
+      return { valid: false, message: "Must be .edu.pk email" };
+    }
+
+
+    return { valid: true };
   },
 
   username: (username: string): { valid: boolean; message?: string } => {
-    const re = /^[a-zA-Z0-9_]{3,20}$/;
+    if (!username.trim()) {
+      return { valid: false, message: "Username required!" };
+    }
+
+    if (username.length < 3) {
+      return { valid: false, message: "Too short (min 3 chars)" };
+    }
+
+    if (username.length > 20) {
+      return { valid: false, message: "Too long (max 20 chars)" };
+    }
+
+    const re = /^[a-zA-Z0-9_]+$/;
     if (!re.test(username)) {
       return {
         valid: false,
-        message: "Usernames must be 3-20 characters using letters, numbers, or underscores.",
+        message: "Only letters, numbers, underscores",
       };
     }
+
     return { valid: true };
   },
 
   password: (password: string): { valid: boolean; message?: string } => {
+    if (!password) {
+      return { valid: false, message: "Password required!" };
+    }
+
     if (password.length < VALIDATION.MIN_PASSWORD_LENGTH) {
       return {
         valid: false,
-        message: `Password must be at least ${VALIDATION.MIN_PASSWORD_LENGTH} characters`,
+        message: `Too short (min ${VALIDATION.MIN_PASSWORD_LENGTH} chars)`,
       };
     }
+
+    if (!/[A-Z]/.test(password)) {
+      return { valid: false, message: "Needs uppercase letter" };
+    }
+
+    if (!/[0-9]/.test(password)) {
+      return { valid: false, message: "Needs a number" };
+    }
+
     return { valid: true };
   },
 
@@ -86,4 +126,3 @@ export const validators = {
 export function sanitizeInput(input: string): string {
   return input.trim().replace(/[<>]/g, "");
 }
-

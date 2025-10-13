@@ -54,13 +54,25 @@ export function ResetPasswordPage() {
   }
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="bg-card/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-border p-8 max-w-md w-full">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Enhanced background decoration */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/15 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"></div>
+      </div>
+      
+      <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-slate-200 dark:border-slate-700 p-8 max-w-md w-full relative z-10">
         <h1 className="text-2xl font-bold mb-2">Reset your password</h1>
         {!hasSession && (
-          <p className="text-sm text-destructive mb-4">
-            The reset link is invalid or expired. Please request a new reset email.
-          </p>
+          <div className="mb-4 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+            <p className="text-sm text-red-700 dark:text-red-300 font-semibold flex items-center gap-2">
+              <svg className="w-4 h-4 flex-shrink-0 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+              </svg>
+              The reset link is invalid or expired. Please request a new reset email.
+            </p>
+          </div>
         )}
         <div className="space-y-3">
           <div>
@@ -89,7 +101,14 @@ export function ResetPasswordPage() {
             <p className="text-xs text-muted-foreground">Password must be at least 8 characters.</p>
           )}
           {confirm && confirm !== password && (
-            <p className="text-xs text-destructive">Passwords do not match.</p>
+            <div className="p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+              <p className="text-xs text-red-700 dark:text-red-300 font-semibold flex items-center gap-2">
+                <svg className="w-3 h-3 flex-shrink-0 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                Passwords do not match.
+              </p>
+            </div>
           )}
           <Button
             className="w-full rounded-2xl h-12 bg-gradient-to-r from-primary to-accent text-white"

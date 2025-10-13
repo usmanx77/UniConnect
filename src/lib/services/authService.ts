@@ -8,8 +8,21 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 
 class AuthService {
   async login(credentials: LoginCredentials): Promise<{ user: User; token: string }> {
+    // Allow login with either email or username
+    let loginEmail = credentials.email.trim();
+    if (!loginEmail.includes("@")) {
+      const { data: profile, error: profileErr } = await supabase
+        .from('profiles')
+        .select('email')
+        .ilike('username', loginEmail)
+        .single();
+      if (profileErr || !profile?.email) {
+        throw new Error(ERROR_MESSAGES.INVALID_CREDENTIALS);
+      }
+      loginEmail = profile.email;
+    }
     const { data, error } = await supabase.auth.signInWithPassword({
-      email: credentials.email.trim(),
+      email: loginEmail,
       password: credentials.password,
     });
     if (error || !data.session || !data.user) {
@@ -49,8 +62,20 @@ class AuthService {
       },
     });
     if (error) {
-      // Surface the exact Supabase message (e.g., invalid_redirect_url, user already registered)
-      throw new Error(error.message || ERROR_MESSAGES.AUTH_FAILED);
+      // Map common Supabase errors to user-friendly messages
+      let userFriendlyMessage = ERROR_MESSAGES.AUTH_FAILED;
+      if (error.message.includes('User already registered')) {
+        userFriendlyMessage = 'An account with this email already exists. Please try logging in instead.';
+      } else if (error.message.includes('invalid_redirect_url')) {
+        userFriendlyMessage = 'There was an issue with the email verification setup. Please try again later.';
+      } else if (error.message.includes('Password should be at least')) {
+        userFriendlyMessage = 'Password does not meet requirements. Please ensure it has at least 8 characters, one uppercase letter, and one number.';
+      } else if (error.message.includes('Invalid email')) {
+        userFriendlyMessage = 'Please enter a valid university email (.edu.pk domain).';
+      } else {
+        userFriendlyMessage = error.message; // Fallback to original message for unknown errors
+      }
+      throw new Error(userFriendlyMessage);
     }
     // Log helpful context for debugging 422s during dev
     try { console.debug('[signUp]', { redirectTo, userId: data?.user?.id }); } catch {}
@@ -59,6 +84,7 @@ class AuthService {
       localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify({ email }));
     } catch {}
   }
+
 
   // Check username availability against DB (profiles.username)
   async checkUsernameAvailability(username: string): Promise<boolean> {
@@ -125,6 +151,9 @@ class AuthService {
 
     const name = (sbUser.user_metadata?.name || sbUser.user_metadata?.username || sbUser.email.split('@')[0] || 'User') as string;
 
+    // Combine session and year into batch string for database compatibility
+    const batchString = `${data.session} ${data.year}`;
+
     // Upsert profile
     const { error: upsertErr } = await supabase
       .from('profiles')
@@ -134,7 +163,7 @@ class AuthService {
         name,
         email: sbUser.email,
         department: data.department,
-        batch: data.batch,
+        batch: batchString,
         username: (sbUser.user_metadata?.username as string | undefined) || null,
       }, { onConflict: 'id' });
     if (upsertErr) {
@@ -147,7 +176,7 @@ class AuthService {
       name,
       email: sbUser.email,
       department: data.department,
-      batch: data.batch,
+      batch: batchString,
       bio: '',
       avatar: sbUser.user_metadata?.avatar_url || '',
       connections: 0,
@@ -197,8 +226,19 @@ class AuthService {
     }
     const redirectTo = typeof window !== 'undefined' ? `${window.location.origin}/reset` : undefined;
     const { error } = await supabase.auth.resetPasswordForEmail(em, { redirectTo });
-    if (error) throw new Error(error.message || ERROR_MESSAGES.AUTH_FAILED);
+    if (error) {
+      let userFriendlyMessage = ERROR_MESSAGES.AUTH_FAILED;
+      if (error.message.includes('User not found')) {
+        userFriendlyMessage = 'No account found with this email address.';
+      } else if (error.message.includes('Email rate limit exceeded')) {
+        userFriendlyMessage = 'Too many reset requests. Please wait a few minutes before trying again.';
+      } else {
+        userFriendlyMessage = error.message;
+      }
+      throw new Error(userFriendlyMessage);
+    }
   }
+
 }
 
 export const authService = new AuthService();

@@ -113,14 +113,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
           connections: 0,
           societies: 0,
         };
+        // Preserve onboarding completion status from storage
+        const onboardingComplete = getFromStorages(STORAGE_KEYS.ONBOARDING_COMPLETE) === "true";
         setState(prev => ({
           ...prev,
           isAuthenticated: true,
           isEmailVerified: Boolean(sbUser.email_confirmed_at),
+          isOnboarded: onboardingComplete,
           user,
         }));
       } else {
-        setState(prev => ({ ...prev, isAuthenticated: false, isEmailVerified: false, user: null }));
+        setState(prev => ({ ...prev, isAuthenticated: false, isEmailVerified: false, isOnboarded: false, user: null }));
       }
     });
     return () => { sub.subscription.unsubscribe(); };
@@ -145,12 +148,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       }
       storage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
       storage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
-      // verification state is driven by Supabase; leave as-is
-      
+      // derive verification status from Supabase session
+      const { data: sessionData } = await supabase.auth.getSession();
+      const verified = Boolean(sessionData.session?.user?.email_confirmed_at);
+      const onboardingComplete = getFromStorages(STORAGE_KEYS.ONBOARDING_COMPLETE) === "true";
       setState({
         isAuthenticated: true,
-        isEmailVerified: false,
-        isOnboarded: false,
+        isEmailVerified: verified,
+        isOnboarded: onboardingComplete,
         user,
         isLoading: false,
         error: null,
@@ -165,38 +170,48 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
-  const signup = async (credentials: LoginCredentials) => {
+  const signup = async (credentials: LoginCredentials & { username?: string }) => {
     setState(prev => ({ ...prev, isLoading: true, error: null }));
     try {
-      const { user, token } = await authService.signup(credentials);
-      // If we obtained a session token immediately, persist and authenticate
-      const persistPref = (typeof window !== 'undefined' ? localStorage.getItem(STORAGE_KEYS.AUTH_PERSIST) : null) || 'local';
-      const storage: Storage = persistPref === 'session' ? sessionStorage : localStorage;
+      // Use direct service method which sets pending verify flags
+      await authService.signUp(credentials.email, credentials.password, credentials.username);
+      // Create a minimal user object until verification/login establishes session
+      const tempUser: User = {
+        id: "",
+        name: credentials.username || credentials.email.split("@")[0],
+        email: credentials.email,
+        department: "",
+        batch: "",
+        bio: "",
+        avatar: "",
+        connections: 0,
+        societies: 0,
+      };
       try {
-        const other = persistPref === 'session' ? localStorage : sessionStorage;
-        other.removeItem(STORAGE_KEYS.AUTH_TOKEN);
-        other.removeItem(STORAGE_KEYS.USER_DATA);
-        other.removeItem(STORAGE_KEYS.ONBOARDING_COMPLETE);
-      } catch (error) {
-        console.error("Failed to clear persisted auth data:", error);
-      }
-      if (token) {
-        storage.setItem(STORAGE_KEYS.AUTH_TOKEN, token);
-      }
-      storage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(user));
-
+        localStorage.setItem(STORAGE_KEYS.USER_DATA, JSON.stringify(tempUser));
+        localStorage.setItem(STORAGE_KEYS.EMAIL_VERIFIED, "false");
+      } catch {}
       setState({
-        isAuthenticated: Boolean(token),
+        isAuthenticated: false,
+        isEmailVerified: false,
         isOnboarded: false,
-        user,
+        user: tempUser,
         isLoading: false,
         error: null,
       });
     } catch (error) {
+      let errorMessage = "Signup failed. Please try again.";
+      if (error instanceof Error) {
+        if (error.message.includes('network') || error.message.includes('fetch')) {
+          errorMessage = "Network error. Please check your connection and try again.";
+        } else {
+          errorMessage = error.message; // Use the mapped message from authService
+        }
+      }
       setState(prev => ({
         ...prev,
         isLoading: false,
-        error: error instanceof Error ? error.message : "Signup failed",
+        error: errorMessage,
       }));
       throw error;
     }

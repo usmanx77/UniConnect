@@ -6,7 +6,7 @@ import { CheckCircle2, ArrowLeft, ArrowRight, User, GraduationCap, Heart, Camera
 import { useAuth } from "../contexts/AuthContext";
 import { useToast } from "../hooks/useToast";
 import { LoadingSpinner } from "./LoadingSpinner";
-import { BATCHES, DEPARTMENTS, APP_NAME, SOCIETY_CATEGORIES } from "../lib/constants";
+import { SESSIONS, YEARS, DEPARTMENTS, APP_NAME, SOCIETY_CATEGORIES } from "../lib/constants";
 
 export function OnboardingPage() {
   const [step, setStep] = useState(1);
@@ -17,6 +17,7 @@ export function OnboardingPage() {
     department: "",
     batch: "",
     session: "",
+    year: "",
     bio: "",
     interests: [] as string[],
     societies: [] as string[],
@@ -54,7 +55,7 @@ export function OnboardingPage() {
 
   const canProceed = () => {
     switch (step) {
-      case 1: return formData.batch;
+      case 1: return formData.session && formData.year;
       case 2: return formData.department;
       case 3: return formData.bio.length >= 10;
       case 4: return formData.interests.length >= 2 && formData.interests.length <= 5;
@@ -67,7 +68,9 @@ export function OnboardingPage() {
     try {
       await completeOnboarding({
         department: formData.department,
-        batch: formData.batch,
+        session: formData.session,
+        year: formData.year,
+        batch: `${formData.session} ${formData.year}`,
         interests: formData.interests,
       });
     } catch {
@@ -113,20 +116,21 @@ export function OnboardingPage() {
   };
 
   if (step === 6) {
-    return (
-      <div className="min-h-screen bg-gradient-to-br from-primary/5 via-accent/5 to-primary/10 dark:from-primary/10 dark:via-accent/10 dark:to-primary/20 flex items-center justify-center p-4 relative overflow-hidden">
-        {/* Background decoration */}
-        <div className="absolute inset-0 overflow-hidden">
-          <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl"></div>
-          <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-accent/20 to-primary/20 rounded-full blur-3xl"></div>
-        </div>
+  return (
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Enhanced background decoration */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/15 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"></div>
+      </div>
         
         <div className="w-full max-w-md text-center relative z-10">
           <div className="bg-card/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-border p-8">
-            <div className="w-24 h-24 rounded-full bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-primary/25 ring-4 ring-primary/10 dark:ring-primary/30">
+            <div className="w-24 h-24 rounded-full bg-primary flex items-center justify-center mx-auto mb-8 shadow-2xl shadow-primary/25 ring-4 ring-primary/20">
               <CheckCircle2 className="w-12 h-12 text-white" />
             </div>
-            <h2 className="text-3xl font-bold mb-4 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Welcome to {APP_NAME}!</h2>
+            <h2 className="text-3xl font-bold mb-4 text-primary">Welcome to {APP_NAME}!</h2>
             <div className="space-y-2 mb-8">
               <p className="text-lg text-muted-foreground">
                 You&apos;re all set, <span className="font-semibold text-primary">{formData.batch}</span>
@@ -135,7 +139,7 @@ export function OnboardingPage() {
             </div>
             <Button 
               onClick={handleComplete} 
-              className="w-full rounded-2xl h-14 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50" 
+              className="w-full rounded-2xl h-14 bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 border-2 border-primary hover:border-primary/80" 
               disabled={isLoading}
             >
               {isLoading ? (
@@ -154,33 +158,31 @@ export function OnboardingPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-accent/5 to-primary/10 dark:from-primary/10 dark:via-accent/10 dark:to-primary/20 flex items-center justify-center p-4 relative overflow-hidden">
-      {/* Background decoration */}
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Enhanced background decoration */}
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-accent/20 to-primary/20 rounded-full blur-3xl"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/15 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"></div>
       </div>
       
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-primary/25 ring-4 ring-primary/10 dark:ring-primary/30">
-            <span className="text-white text-3xl font-bold">U</span>
-          </div>
-          <h2 className="text-3xl font-bold mb-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">Complete Your Profile</h2>
+          <h2 className="text-3xl font-bold mb-3 text-primary">Complete Your Profile</h2>
           <p className="text-muted-foreground text-lg">Help us personalize your experience</p>
         </div>
 
-        <div className="bg-card/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-border p-8 relative">
+        <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-slate-200 dark:border-slate-700 p-8 relative">
           {/* Progress indicator */}
           <div className="flex items-center gap-3 mb-8">
             {Array.from({ length: totalSteps }, (_, i) => (
               <div
                 key={i}
                 className={`flex-1 h-3 rounded-full transition-all duration-500 ${
-                  step > i + 1 
-                    ? "bg-gradient-to-r from-primary to-accent shadow-lg shadow-primary/30" 
-                    : step === i + 1 
-                    ? "bg-gradient-to-r from-primary/70 to-accent/70 shadow-md shadow-primary/20" 
+                  step > i + 1
+                    ? "bg-primary shadow-lg shadow-primary/30"
+                    : step === i + 1
+                    ? "bg-primary/70 shadow-md shadow-primary/20"
                     : "bg-muted"
                 }`}
               />
@@ -189,32 +191,49 @@ export function OnboardingPage() {
 
           {/* Step header */}
           <div className="text-center mb-8">
-            <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-primary/10 to-accent/10 dark:from-primary/20 dark:to-accent/20 flex items-center justify-center mx-auto mb-6 shadow-lg">
+            <div className="w-16 h-16 rounded-2xl bg-primary/10 dark:bg-primary/20 flex items-center justify-center mx-auto mb-6 shadow-lg">
               <div className="w-8 h-8 text-primary">
                 {getStepIcon(step)}
               </div>
             </div>
-            <h3 className="text-2xl font-bold mb-3 bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent">{getStepTitle(step)}</h3>
-            <p className="text-muted-foreground text-lg">{getStepDescription(step)}</p>
+            <h3 className="text-2xl font-bold mb-3 text-primary">{getStepTitle(step)}</h3>
+            <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">{getStepDescription(step)}</p>
           </div>
 
           {/* Step content */}
           <div className="space-y-6">
             {step === 1 && (
-              <div className="space-y-4">
-                <label className="block text-lg font-semibold text-foreground">Select Your Batch</label>
-                <Select value={formData.batch} onValueChange={(value) => handleInputChange("batch", value)}>
-                  <SelectTrigger className="w-full rounded-2xl h-14 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300 text-lg">
-                    <SelectValue placeholder="Choose your batch..." />
-                  </SelectTrigger>
-                  <SelectContent className="rounded-2xl border-2 border-border shadow-xl">
-                    {BATCHES.map((b) => (
-                      <SelectItem key={b} value={b} className="text-lg py-3">
-                        {b}
-                      </SelectItem>
-                    ))}
-                  </SelectContent>
-                </Select>
+              <div className="space-y-6">
+                <div>
+                  <label className="block text-lg font-semibold text-foreground mb-2">Select Your Session</label>
+                  <Select value={formData.session} onValueChange={(value) => handleInputChange("session", value)}>
+                    <SelectTrigger className="w-full rounded-2xl h-14 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300 text-lg">
+                      <SelectValue placeholder="Choose your session..." />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-2xl border-2 border-border shadow-xl">
+                      {SESSIONS.map((s) => (
+                        <SelectItem key={s} value={s} className="text-lg py-3">
+                          {s}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                <div>
+                  <label className="block text-lg font-semibold text-foreground mb-2">Select Your Year</label>
+                  <Select value={formData.year} onValueChange={(value) => handleInputChange("year", value)}>
+                    <SelectTrigger className="w-full rounded-2xl h-14 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300 text-lg">
+                      <SelectValue placeholder="Choose your year..." />
+                    </SelectTrigger>
+                    <SelectContent className="rounded-2xl border-2 border-border shadow-xl">
+                      {YEARS.map((y) => (
+                        <SelectItem key={y} value={y} className="text-lg py-3">
+                          {y}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
               </div>
             )}
 
@@ -329,7 +348,7 @@ export function OnboardingPage() {
               <Button
                 onClick={step === totalSteps ? () => setStep(6) : handleNext}
                 disabled={!canProceed()}
-                className={`${step === 1 ? "w-full" : "flex-1"} rounded-2xl h-14 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed`}
+                className={`${step === 1 ? "w-full" : "flex-1"} rounded-2xl h-14 bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border-2 border-primary hover:border-primary/80`}
               >
                 {step === totalSteps ? "Review" : "Continue"}
                 {step < totalSteps && <ArrowRight className="w-5 h-5 ml-2" />}

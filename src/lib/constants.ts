@@ -10,7 +10,7 @@ export const isProduction = typeof process !== 'undefined'
   : import.meta.env?.PROD ?? false;
 
 // App Configuration
-export const APP_NAME = "Campusloif";
+export const APP_NAME = "CampusLoif";
 export const APP_VERSION = "1.0.0";
 
 // Storage Keys
@@ -51,7 +51,21 @@ export const DEPARTMENTS = [
   "Arts & Design",
 ] as const;
 
-// Batches
+// Sessions
+export const SESSIONS = [
+  "Fall",
+  "Spring",
+] as const;
+
+// Years
+export const YEARS = [
+  "2023",
+  "2024",
+  "2025",
+  "2026",
+] as const;
+
+// Batches (for backward compatibility)
 export const BATCHES = [
   "Fall 2023",
   "Spring 2024",

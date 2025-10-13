@@ -9,7 +9,7 @@ export function Sidebar() {
 
   return (
     <nav
-      className="hidden md:block fixed left-0 top-[60px] bottom-0 w-64 border-r border-border bg-card p-4"
+      className="hidden md:block fixed left-0 top-[70px] bottom-0 w-64 border-r border-border bg-card p-4"
       aria-label="Main navigation"
     >
       <div className="space-y-1">

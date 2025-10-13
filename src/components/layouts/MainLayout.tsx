@@ -37,7 +37,7 @@ export function MainLayout() {
 
       <Sidebar />
 
-      <main className="md:ml-64 pt-[60px] md:pt-0">
+      <main className="md:ml-64 pt-[70px] pb-16 md:pb-0">
         <Suspense fallback={<LoadingSpinner fullScreen size="lg" text="Loading page..." />}>
           {currentPage === "home" && (
             <HomePage onOpenCreatePost={() => setCreatePostOpen(true)} />

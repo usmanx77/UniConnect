@@ -19,29 +19,34 @@ export function CreatePostDialog({ open, onOpenChange, onPostCreated }: CreatePo
   const [postContent, setPostContent] = useState("");
   const [postType, setPostType] = useState<"text" | "poll">("text");
   const [isSubmitting, setIsSubmitting] = useState(false);
+  const [error, setError] = useState("");
   const { user } = useAuth();
   const toast = useToast();
+
 
   const handlePost = async () => {
     const validation = validators.postContent(postContent);
     if (!validation.valid) {
-      toast.error(validation.message || "Invalid post content");
+      setError(validation.message || "Invalid post content");
       return;
     }
+    setError("");
 
     setIsSubmitting(true);
     try {
       await postService.createPost({ content: postContent });
       toast.success(toast.messages.success.POST_CREATED);
       setPostContent("");
+      setError("");
       onOpenChange(false);
       onPostCreated?.();
     } catch {
-      toast.error("Failed to create post. Please try again.");
+      setError("Failed to create post. Please try again.");
     } finally {
       setIsSubmitting(false);
     }
   };
+
 
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
@@ -69,9 +74,24 @@ export function CreatePostDialog({ open, onOpenChange, onPostCreated }: CreatePo
           <Textarea
             placeholder="What's on your mind?"
             value={postContent}
-            onChange={(e) => setPostContent(e.target.value)}
+            onChange={(e) => {
+              setPostContent(e.target.value);
+              if (error) setError("");
+            }}
             className="min-h-[120px] mb-4 rounded-xl resize-none"
           />
+
+          {error && (
+            <div className="mt-1 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+              <p className="text-sm text-red-700 dark:text-red-300 flex items-center gap-2 font-semibold">
+                <svg className="w-4 h-4 flex-shrink-0 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                  <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                </svg>
+                {error}
+              </p>
+            </div>
+          )}
+
 
           {postType === "poll" && (
             <div className="space-y-3 mb-4">

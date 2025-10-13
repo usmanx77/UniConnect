@@ -1,3 +1,4 @@
+@import url('https://fonts.googleapis.com/css2?family=Pacifico&display=swap');
 @custom-variant dark (&:is(.dark *));
 
 :root {
@@ -8,37 +9,37 @@
   --card-foreground: #1a1d29;
   --popover: #ffffff;
   --popover-foreground: #1a1d29;
-  --primary: #8b5cf6;
+  --primary: #6d28d9; /* bolder primary */
   --primary-foreground: #ffffff;
-  --secondary: #f1f3f9;
+  --secondary: #e5e7eb; /* slightly deeper */
   --secondary-foreground: #1a1d29;
-  --muted: #e8ebf3;
-  --muted-foreground: #6b7280;
-  --accent: #eef0ff;
-  --accent-foreground: #5b6ef6;
+  --muted: #d1d5db; /* stronger contrast */
+  --muted-foreground: #4b5563;
+  --accent: #e0e7ff; /* richer accent background */
+  --accent-foreground: #4338ca; /* deeper accent fg */
   --destructive: #ef4444;
   --destructive-foreground: #ffffff;
-  --border: #e5e7eb;
+  --border: #cbd5e1; /* darker border for bolder containers */
   --input: transparent;
   --input-background: #f9fafb;
   --switch-background: #d1d5db;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: #5b6ef6;
-  --chart-1: #5b6ef6;
-  --chart-2: #8b5cf6;
+  --ring: #4338ca;
+  --chart-1: #4338ca;
+  --chart-2: #6d28d9;
   --chart-3: #10b981;
   --chart-4: #f59e0b;
   --chart-5: #ef4444;
   --radius: 0.75rem;
   --sidebar: #ffffff;
   --sidebar-foreground: #1a1d29;
-  --sidebar-primary: #5b6ef6;
+  --sidebar-primary: #4338ca;
   --sidebar-primary-foreground: #ffffff;
   --sidebar-accent: #f1f3f9;
   --sidebar-accent-foreground: #1a1d29;
-  --sidebar-border: #e5e7eb;
-  --sidebar-ring: #5b6ef6;
+  --sidebar-border: #cbd5e1;
+  --sidebar-ring: #4338ca;
 }
 
 .dark {
@@ -48,25 +49,25 @@
   --card-foreground: #f9fafb;
   --popover: #1a1d29;
   --popover-foreground: #f9fafb;
-  --primary: #a855f7;
+  --primary: #7c3aed; /* bolder primary (dark) */
   --primary-foreground: #ffffff;
   --secondary: #1f2937;
   --secondary-foreground: #f9fafb;
   --muted: #374151;
   --muted-foreground: #9ca3af;
-  --accent: #312e81;
+  --accent: #1e1b4b;
   --accent-foreground: #c7d2fe;
   --destructive: #dc2626;
   --destructive-foreground: #ffffff;
-  --border: #374151;
+  --border: #4b5563; /* lighter border for stronger contrast in dark */
   --input: transparent;
   --input-background: #1f2937;
   --switch-background: #4b5563;
   --font-weight-medium: 500;
   --font-weight-normal: 400;
-  --ring: #818cf8;
-  --chart-1: #818cf8;
-  --chart-2: #a78bfa;
+  --ring: #7c3aed;
+  --chart-1: #7c3aed;
+  --chart-2: #8b5cf6;
   --chart-3: #34d399;
   --chart-4: #fbbf24;
   --chart-5: #f87171;

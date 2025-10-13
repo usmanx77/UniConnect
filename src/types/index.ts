@@ -281,7 +281,9 @@ export interface LoginCredentials {
 
 export interface OnboardingData {
   department: string;
-  batch: string;
+  session: string;
+  year: string;
+  batch: string; // Combined session + year for backward compatibility
   interests: string[];
 }
 

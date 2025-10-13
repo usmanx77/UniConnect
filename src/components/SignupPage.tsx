@@ -34,6 +34,24 @@ export function SignupPage() {
   const handleInputChange = (field: keyof typeof formData, value: string) => {
     setFormData(prev => ({ ...prev, [field]: value }));
     if (errors[field]) setErrors(prev => ({ ...prev, [field]: "" }));
+
+    // Real-time validation
+    if (field === 'email' && value) {
+      const validation = validators.email(value);
+      if (!validation.valid) {
+        setErrors(prev => ({ ...prev, email: validation.message || "" }));
+      }
+    } else if (field === 'username' && value) {
+      const validation = validators.username(value);
+      if (!validation.valid) {
+        setErrors(prev => ({ ...prev, username: validation.message || "" }));
+      }
+    } else if (field === 'password' && value) {
+      const validation = validators.password(value);
+      if (!validation.valid) {
+        setErrors(prev => ({ ...prev, password: validation.message || "" }));
+      }
+    }
   };
 
   // Username availability (mock)
@@ -75,27 +93,31 @@ export function SignupPage() {
   const validateForm = () => {
     const newErrors: Record<string, string> = {};
     if (!formData.username.trim()) {
-      newErrors.username = "Username is required";
+      newErrors.username = "Username required!";
     } else if (!validators.username(formData.username).valid) {
       newErrors.username = validators.username(formData.username).message || "Invalid username";
     } else if (usernameAvailable === false) {
-      newErrors.username = "Username already taken. Please choose another.";
+      newErrors.username = "Username taken!";
     }
 
     if (!formData.email.trim()) {
-      newErrors.email = "Email is required";
-    } else if (!validators.email(formData.email)) {
-      newErrors.email = "Please enter a valid university email (.edu.pk)";
-    } else if (emailAvailable === false) {
-      newErrors.email = "Email already in use";
+      newErrors.email = "Email required!";
+    } else {
+      const emailValidation = validators.email(formData.email);
+      if (!emailValidation.valid) {
+        newErrors.email = emailValidation.message || "Invalid email";
+      } else if (emailAvailable === false) {
+        newErrors.email = "Email in use!";
+      }
     }
+
 
     const pv = validators.password(formData.password);
     if (!pv.valid) newErrors.password = pv.message || "";
-    if (!formData.confirmPassword) newErrors.confirmPassword = "Please confirm your password";
-    else if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords do not match";
+    if (!formData.confirmPassword) newErrors.confirmPassword = "Confirm password!";
+    else if (formData.password !== formData.confirmPassword) newErrors.confirmPassword = "Passwords don't match!";
 
-    if (!agreeTerms) newErrors.terms = "You must agree to the Terms to continue";
+    if (!agreeTerms) newErrors.terms = "Agree to terms!";
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
@@ -112,11 +134,19 @@ export function SignupPage() {
       // Redirect to root and show Verify page (AppRouter will handle pending verify)
       window.location.href = '/';
     } catch (err) {
-      const msg = err instanceof Error ? err.message : "Failed to create account. Please try again.";
+      let msg = "Signup failed!";
+      if (err instanceof Error) {
+        if (err.message.includes('network') || err.message.includes('fetch')) {
+          msg = "Network error!";
+        } else {
+          msg = err.message;
+        }
+      }
       toast.error(msg);
     } finally {
       setIsSubmitting(false);
     }
+
   };
 
   if (isSubmitting) {
@@ -124,46 +154,65 @@ export function SignupPage() {
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-primary/5 via-accent/5 to-primary/10 dark:from-primary/10 dark:via-accent/10 dark:to-primary/20 flex items-center justify-center p-4 relative overflow-hidden">
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
       <div className="absolute inset-0 overflow-hidden">
-        <div className="absolute -top-40 -right-40 w-80 h-80 bg-gradient-to-br from-primary/20 to-accent/20 rounded-full blur-3xl"></div>
-        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-gradient-to-tr from-accent/20 to-primary/20 rounded-full blur-3xl"></div>
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/15 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"></div>
       </div>
 
       <div className="w-full max-w-md relative z-10">
         <div className="text-center mb-8">
-          <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary to-accent flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-primary/25 ring-4 ring-primary/10 dark:ring-primary/30">
-            <span className="text-white text-3xl font-bold">U</span>
-          </div>
-          <h1 className="text-3xl font-bold bg-gradient-to-r from-primary to-accent bg-clip-text text-transparent mb-3">Join {APP_NAME}</h1>
-          <p className="text-muted-foreground text-lg">Connect with your university community</p>
+          <h1 className="text-4xl font-brand text-primary mb-3">{APP_NAME}</h1>
+          <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">Join your university community</p>
         </div>
 
-        <div className="bg-card/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-border p-8 relative">
+        <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-slate-200 dark:border-slate-700 p-8 relative">
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="space-y-1">
-              <label htmlFor="username" className="block text-sm font-semibold text-foreground">Username</label>
+              <label htmlFor="username" className="block text-sm font-bold text-slate-700 dark:text-slate-300">Username</label>
               <Input
                 id="username"
                 value={formData.username}
                 onChange={(e) => handleInputChange("username", e.target.value)}
                 placeholder="your_unique_handle"
-                className="rounded-2xl h-12 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300"
+                className={`rounded-2xl h-12 border-2 transition-all duration-300 ${
+                  errors.username
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                    : formData.username && !errors.username && usernameAvailable === true
+                    ? "border-green-500 focus:border-green-500 focus:ring-green-500/20"
+                    : "border-slate-300 dark:border-slate-600 focus:border-primary focus:ring-primary/20"
+                }`}
                 aria-invalid={!!errors.username}
                 aria-describedby={errors.username ? "username-error" : undefined}
               />
               <div className="text-xs h-4">
-                {usernameChecking && <span className="text-muted-foreground">Checking availability…</span>}
-                {usernameAvailable === true && <span className="text-primary">Available</span>}
-                {usernameAvailable === false && <span className="text-destructive">Username taken</span>}
+                {usernameChecking && <span className="text-slate-500 dark:text-slate-400">Checking availability…</span>}
+                {usernameAvailable === true && (
+                  <div className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                    <span className="text-green-700 dark:text-green-300 font-semibold text-xs">✓ Available</span>
+                  </div>
+                )}
+                {usernameAvailable === false && (
+                  <div className="inline-flex items-center gap-1 px-2 py-1 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <span className="text-red-700 dark:text-red-300 font-semibold text-xs">✗ Username taken</span>
+                  </div>
+                )}
               </div>
               {errors.username && (
-                <p id="username-error" className="text-sm text-destructive mt-1 flex items-center gap-1">{errors.username}</p>
+                <div className="mt-1 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+                  <p id="username-error" className="text-sm text-red-700 dark:text-red-300 flex items-center gap-2 font-semibold">
+                    <svg className="w-4 h-4 flex-shrink-0 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.username}
+                  </p>
+                </div>
               )}
             </div>
 
             <div className="space-y-1">
-              <label htmlFor="email" className="block text-sm font-semibold text-foreground">University Email (.edu.pk)</label>
+              <label htmlFor="email" className="block text-sm font-bold text-slate-700 dark:text-slate-300">University Email (.edu.pk)</label>
               <Input
                 id="email"
                 type="email"
@@ -171,63 +220,92 @@ export function SignupPage() {
                 onChange={(e) => handleInputChange("email", e.target.value)}
                 placeholder="your.name@your-university.edu.pk"
                 autoComplete="email"
-                className="rounded-2xl h-12 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300"
+                className={`rounded-2xl h-12 border-2 transition-all duration-300 ${
+                  errors.email
+                    ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                    : formData.email && !errors.email && emailAvailable === true
+                    ? "border-green-500 focus:border-green-500 focus:ring-green-500/20"
+                    : "border-slate-300 dark:border-slate-600 focus:border-primary focus:ring-primary/20"
+                }`}
                 aria-invalid={!!errors.email}
                 aria-describedby={errors.email ? "email-error" : undefined}
               />
               <div className="text-xs h-4 flex items-center gap-2">
-                {emailChecking && <span className="text-muted-foreground">Checking email…</span>}
-                {emailAvailable === true && <span className="text-primary">Email available</span>}
-                {emailAvailable === false && <span className="text-destructive">Email already in use</span>}
-                {detectedDomain && <span className="text-muted-foreground">Detected: {detectedDomain}</span>}
+                {emailChecking && <span className="text-slate-500 dark:text-slate-400">Checking email…</span>}
+                {emailAvailable === true && (
+                  <div className="inline-flex items-center gap-1 px-2 py-1 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-lg">
+                    <span className="text-green-700 dark:text-green-300 font-semibold text-xs">✓ Email available</span>
+                  </div>
+                )}
+                {emailAvailable === false && (
+                  <div className="inline-flex items-center gap-1 px-2 py-1 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg">
+                    <span className="text-red-700 dark:text-red-300 font-semibold text-xs">✗ Email already in use</span>
+                  </div>
+                )}
+                {detectedDomain && <span className="text-blue-600 dark:text-blue-400 font-medium">📍 {detectedDomain}</span>}
               </div>
               {errors.email && (
-                <p id="email-error" className="text-sm text-destructive mt-1 flex items-center gap-1">{errors.email}</p>
+                <div className="mt-1 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+                  <p id="email-error" className="text-sm text-red-700 dark:text-red-300 flex items-center gap-2 font-semibold">
+                    <svg className="w-4 h-4 flex-shrink-0 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.email}
+                  </p>
+                </div>
               )}
             </div>
 
             <div className="space-y-1">
-              <label htmlFor="password" className="block text-sm font-semibold text-foreground">Password</label>
+              <label htmlFor="password" className="block text-sm font-bold text-slate-700 dark:text-slate-300">Password</label>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   value={formData.password}
                   onChange={(e) => handleInputChange("password", e.target.value)}
-                  placeholder="Enter your password" 
-                  autoComplete="new-password" 
-                  className="rounded-2xl h-12 pr-12 border-2 border-border focus:border-primary focus:ring-primary/20 transition-all duration-300"
+                  placeholder="Enter your password"
+                  autoComplete="new-password"
+                  className={`rounded-2xl h-12 pr-12 border-2 transition-all duration-300 ${
+                    errors.password
+                      ? "border-red-500 focus:border-red-500 focus:ring-red-500/20"
+                      : formData.password && !errors.password
+                      ? "border-green-500 focus:border-green-500 focus:ring-green-500/20"
+                      : "border-slate-300 dark:border-slate-600 focus:border-primary focus:ring-primary/20"
+                  }`}
                   aria-invalid={!!errors.password}
                   aria-describedby={errors.password ? "password-error" : undefined}
                 />
                 <button
                   type="button"
                   onClick={() => setShowPassword(!showPassword)}
-                  className="absolute right-4 top-1/2 -translate-y-1/2 text-muted-foreground hover:text-gray-600 transition-colors duration-200"
+                  className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600 dark:text-slate-500 dark:hover:text-slate-300 transition-colors duration-200"
                 >
                   {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                 </button>
               </div>
               {errors.password && (
-                <p id="password-error" className="text-sm text-destructive mt-1 flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  {errors.password}
-                </p>
+                <div className="mt-1 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+                  <p id="password-error" className="text-sm text-red-700 dark:text-red-300 flex items-center gap-2 font-semibold">
+                    <svg className="w-4 h-4 flex-shrink-0 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.password}
+                  </p>
+                </div>
               )}
-              <div className="mt-1 text-xs space-y-1">
+              <div className="mt-2 text-xs space-y-2 bg-slate-50 dark:bg-slate-800 p-3 rounded-xl border border-slate-200 dark:border-slate-700">
                 <div className="flex items-center gap-3 text-sm">
-                  <CheckCircle2 className={`w-4 h-4 ${formData.password.length >= 8 ? "text-primary" : "text-muted-foreground"}`} />
-                  <span className={formData.password.length >= 8 ? "text-primary" : "text-muted-foreground"}>At least 8 characters</span>
+                  <CheckCircle2 className={`w-4 h-4 ${formData.password.length >= 8 ? "text-green-500" : "text-slate-400"}`} />
+                  <span className={formData.password.length >= 8 ? "text-green-600 dark:text-green-400 font-medium" : "text-slate-500 dark:text-slate-400"}>At least 8 characters</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
-                  <CheckCircle2 className={`w-4 h-4 ${/[A-Z]/.test(formData.password) ? "text-primary" : "text-muted-foreground"}`} />
-                  <span className={/[A-Z]/.test(formData.password) ? "text-primary" : "text-muted-foreground"}>One uppercase letter</span>
+                  <CheckCircle2 className={`w-4 h-4 ${/[A-Z]/.test(formData.password) ? "text-green-500" : "text-slate-400"}`} />
+                  <span className={/[A-Z]/.test(formData.password) ? "text-green-600 dark:text-green-400 font-medium" : "text-slate-500 dark:text-slate-400"}>One uppercase letter</span>
                 </div>
                 <div className="flex items-center gap-3 text-sm">
-                  <CheckCircle2 className={`w-4 h-4 ${/[0-9]/.test(formData.password) ? "text-primary" : "text-muted-foreground"}`} />
-                  <span className={/[0-9]/.test(formData.password) ? "text-primary" : "text-muted-foreground"}>One number</span>
+                  <CheckCircle2 className={`w-4 h-4 ${/[0-9]/.test(formData.password) ? "text-green-500" : "text-slate-400"}`} />
+                  <span className={/[0-9]/.test(formData.password) ? "text-green-600 dark:text-green-400 font-medium" : "text-slate-500 dark:text-slate-400"}>One number</span>
                 </div>
               </div>
             </div>
@@ -254,12 +332,14 @@ export function SignupPage() {
                 </button>
               </div>
               {errors.confirmPassword && (
-                <p id="confirmPassword-error" className="text-sm text-destructive mt-1 flex items-center gap-1">
-                  <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 20 20">
-                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
-                  </svg>
-                  {errors.confirmPassword}
-                </p>
+                <div className="mt-1 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+                  <p id="confirmPassword-error" className="text-sm text-red-700 dark:text-red-300 flex items-center gap-2 font-semibold">
+                    <svg className="w-4 h-4 flex-shrink-0 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                      <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.confirmPassword}
+                  </p>
+                </div>
               )}
             </div>
 
@@ -269,11 +349,20 @@ export function SignupPage() {
                 I agree to the <a className="text-primary hover:underline" href="#">Terms of Service</a> and <a className="text-primary hover:underline" href="#">Privacy Policy</a>.
               </label>
             </div>
-            {errors.terms && <p className="text-sm text-destructive -mt-1">{errors.terms}</p>}
+            {errors.terms && (
+              <div className="mt-1 p-3 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-xl">
+                <p className="text-sm text-red-700 dark:text-red-300 flex items-center gap-2 font-semibold">
+                  <svg className="w-4 h-4 flex-shrink-0 text-red-600 dark:text-red-400" fill="currentColor" viewBox="0 0 20 20">
+                    <path fillRule="evenodd" d="M18 10a8 8 0 11-16 0 8 8 0 0116 0zm-7 4a1 1 0 11-2 0 1 1 0 012 0zm-1-9a1 1 0 00-1 1v4a1 1 0 102 0V6a1 1 0 00-1-1z" clipRule="evenodd" />
+                    </svg>
+                    {errors.terms}
+                  </p>
+                </div>
+              )}
 
-            <Button 
-              type="submit" 
-              className="w-full rounded-2xl h-14 bg-gradient-to-r from-primary to-accent hover:from-primary/90 hover:to-accent/90 text-white font-semibold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed" 
+            <Button
+              type="submit"
+              className="w-full rounded-2xl h-14 bg-primary hover:bg-primary/90 text-white font-bold text-lg shadow-lg hover:shadow-xl transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed border-2 border-primary hover:border-primary/80"
               disabled={isSubmitting}
             >
               {isSubmitting ? (
@@ -289,10 +378,10 @@ export function SignupPage() {
         </div>
 
         <div className="text-center mt-8">
-          <p className="text-muted-foreground text-lg">
+          <p className="text-slate-600 dark:text-slate-400 text-lg font-medium">
             Already have an account?{" "}
-            <button 
-              className="text-primary hover:underline transition-colors duration-200" 
+            <button
+              className="text-primary hover:text-primary/80 font-bold underline transition-colors duration-200"
               onClick={() => window.history.back()}
             >
               Sign in

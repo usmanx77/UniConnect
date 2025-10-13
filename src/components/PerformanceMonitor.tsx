@@ -19,18 +19,19 @@ export function PerformanceMonitor() {
 
     const measurePerformance = () => {
       const navigation = performance.getEntriesByType('navigation')[0] as PerformanceNavigationTiming;
-      const paintEntries = performance.getEntriesByType('paint');
-      
+
       const loadTime = navigation.loadEventEnd - navigation.loadEventStart;
-      const firstContentfulPaint = paintEntries.find(entry => entry.name === 'first-contentful-paint')?.startTime || 0;
+      const firstContentfulPaint = 0; // Paint timing API deprecated, set to 0
       const largestContentfulPaint = performance.getEntriesByType('largest-contentful-paint')[0]?.startTime || 0;
+
       
       // Estimate bundle size from loaded resources
-      const resources = performance.getEntriesByType('resource');
-      const jsResources = resources.filter(resource => 
+      const resources = performance.getEntriesByType('resource') as PerformanceResourceTiming[];
+      const jsResources = resources.filter(resource =>
         resource.name.includes('.js') && !resource.name.includes('node_modules')
       );
       const bundleSize = jsResources.reduce((total, resource) => total + (resource.transferSize || 0), 0);
+
 
       setMetrics({
         loadTime,

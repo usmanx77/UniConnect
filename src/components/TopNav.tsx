@@ -2,11 +2,13 @@ import { Bell, Search, Moon, Sun } from "lucide-react";
 import { Button } from "./ui/button";
 import { Badge } from "./ui/badge";
 import { Avatar, AvatarFallback, AvatarImage } from "./ui/avatar";
+import { useIsMobile } from "./ui/use-mobile";
 import { useState } from "react";
 import { NotificationPanel } from "./NotificationPanel";
 import { useNotifications } from "../contexts/NotificationContext";
 import { useApp } from "../contexts/AppContext";
 import { useAuth } from "../contexts/AuthContext";
+import { APP_NAME } from "../lib/constants";
 
 interface TopNavProps {
   title?: string;
@@ -16,29 +18,41 @@ interface TopNavProps {
   onSearchClick?: () => void;
 }
 
-export function TopNav({ title = "UniConnect", showSearch = false, darkMode, onToggleDarkMode, onSearchClick }: TopNavProps) {
+export function TopNav({ title = APP_NAME, showSearch = false, darkMode, onToggleDarkMode, onSearchClick }: TopNavProps) {
   const [notificationOpen, setNotificationOpen] = useState(false);
   const { unreadCount } = useNotifications();
   const { navigate } = useApp();
   const { user } = useAuth();
+  const isMobile = useIsMobile();
+  const isBrandTitle = title === APP_NAME;
 
   return (
-    <header className="sticky top-0 bg-card border-b border-border z-40 backdrop-blur-sm bg-card/95 h-[60px]">
+    <header className="fixed top-0 left-0 right-0 bg-card border-b border-border z-40 backdrop-blur-sm bg-card/95 h-[70px]">
       <div className="max-w-6xl mx-auto px-4 h-full flex items-center justify-between gap-4">
         <div className="flex items-center gap-3">
-          <button
-            onClick={() => navigate("profile")}
-            className="rounded-full hover:bg-accent p-1 transition-colors"
-            aria-label="Go to profile"
-          >
-            <Avatar className="w-8 h-8 rounded-full">
-              <AvatarImage src={user?.avatar} alt={user?.name} />
-              <AvatarFallback className="rounded-full bg-gradient-to-br from-primary to-purple-600 text-white">
-                {user?.name?.charAt(0).toUpperCase() || "U"}
-              </AvatarFallback>
-            </Avatar>
-          </button>
-          <h1 className="hidden sm:block text-xl font-semibold text-foreground">{title}</h1>
+          {isMobile ? (
+            <button
+              onClick={() => navigate("home")}
+              className="rounded-full hover:bg-accent p-1 transition-colors"
+              aria-label="Go to home"
+            >
+              <span className="text-lg font-bold text-primary font-brand">CampusLoif</span>
+            </button>
+          ) : (
+            <button
+              onClick={() => navigate("profile")}
+              className="rounded-full hover:bg-accent p-1 transition-colors"
+              aria-label="Go to profile"
+            >
+              <Avatar className="w-8 h-8 rounded-full">
+                <AvatarImage src={user?.avatar} alt={user?.name} />
+                <AvatarFallback className="rounded-full bg-gradient-to-br from-primary to-purple-600 text-white">
+                  {user?.name?.charAt(0).toUpperCase() || APP_NAME.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+            </button>
+          )}
+          <h1 className={`hidden sm:block text-xl ${isBrandTitle ? "font-brand" : "font-semibold"} text-foreground`}>{title}</h1>
         </div>
 
         {showSearch && (
@@ -84,14 +98,29 @@ export function TopNav({ title = "UniConnect", showSearch = false, darkMode, onT
               </Badge>
             )}
           </Button>
-          <Button
-            variant="ghost"
-            size="icon"
-            className="rounded-full hover:bg-accent"
-            onClick={onToggleDarkMode}
-          >
-            {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
-          </Button>
+          {isMobile ? (
+            <button
+              onClick={() => navigate("profile")}
+              className="rounded-full hover:bg-accent p-1 transition-colors"
+              aria-label="Go to profile"
+            >
+              <Avatar className="w-8 h-8 rounded-full">
+                <AvatarImage src={user?.avatar} alt={user?.name} />
+                <AvatarFallback className="rounded-full bg-gradient-to-br from-primary to-purple-600 text-white">
+                  {user?.name?.charAt(0).toUpperCase() || APP_NAME.charAt(0)}
+                </AvatarFallback>
+              </Avatar>
+            </button>
+          ) : (
+            <Button
+              variant="ghost"
+              size="icon"
+              className="rounded-full hover:bg-accent"
+              onClick={onToggleDarkMode}
+            >
+              {darkMode ? <Sun className="h-5 w-5" /> : <Moon className="h-5 w-5" />}
+            </Button>
+          )}
         </div>
       </div>
 

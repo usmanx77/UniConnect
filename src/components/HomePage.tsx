@@ -169,13 +169,13 @@ export function HomePage({ onOpenCreatePost }: HomePageProps) {
 
   return (
     <PullToRefresh onRefresh={handleRefresh}>
-      <div className="max-w-6xl mx-auto px-4 pt-4 pb-20 md:pb-6">
+      <div className="max-w-6xl mx-auto px-2 pt-6 pb-20 md:px-4 md:pt-8 md:pb-6">
         {/* Stories Bar */}
-        <div className="mb-4">
+        <div className="mt-6 md:mt-8 mb-6 md:mb-8">
           <StoriesBar />
         </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
+
+        <div className="grid grid-cols-1 lg:grid-cols-3 gap-2 md:gap-4">
             {/* Main Feed */}
             <div className="lg:col-span-2 space-y-4">
               <PostComposer onOpenCreatePost={onOpenCreatePost} />

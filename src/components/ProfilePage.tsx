@@ -32,7 +32,7 @@ export function ProfilePage() {
   ];
 
   return (
-    <div className="max-w-4xl mx-auto px-4 pt-6 pb-20 md:pb-6">
+    <div className="max-w-4xl mx-auto px-2 pt-2 pb-20 md:px-4 md:pt-6 md:pb-6">
       <div className="bg-card rounded-2xl border border-border shadow-sm overflow-hidden mb-6 relative">
         <div className="h-32 bg-gradient-to-r from-primary to-purple-600"></div>
         <Button 

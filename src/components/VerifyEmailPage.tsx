@@ -41,21 +41,25 @@ export function VerifyEmailPage() {
   };
 
   return (
-    <div className="min-h-screen bg-background flex items-center justify-center p-4">
-      <div className="bg-card/80 backdrop-blur-sm rounded-3xl shadow-2xl border border-border p-8 max-w-md w-full text-center">
-        <div className="w-20 h-20 rounded-3xl bg-gradient-to-br from-primary via-primary to-accent flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-primary/25 ring-4 ring-primary/20">
-          <span className="text-white text-3xl font-brand">C</span>
-        </div>
-        <h1 className="text-2xl font-bold mb-2">Welcome to <span className="font-brand">{APP_NAME}</span>!</h1>
-        <p className="text-muted-foreground mb-6">
-          We just sent a confirmation link to <span className="font-medium">{email}</span>.
-          Tap the link to verify your account.
+    <div className="min-h-screen bg-slate-50 dark:bg-slate-900 flex items-center justify-center p-4 relative overflow-hidden">
+      {/* Enhanced background decoration */}
+      <div className="absolute inset-0 overflow-hidden">
+        <div className="absolute -top-40 -right-40 w-80 h-80 bg-primary/15 rounded-full blur-3xl"></div>
+        <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl"></div>
+        <div className="absolute top-1/2 left-1/2 transform -translate-x-1/2 -translate-y-1/2 w-96 h-96 bg-purple-500/5 rounded-full blur-3xl"></div>
+      </div>
+      
+      <div className="bg-white/90 dark:bg-slate-800/90 backdrop-blur-sm rounded-3xl shadow-2xl border-2 border-slate-200 dark:border-slate-700 p-8 max-w-md w-full text-center relative z-10">
+        <h1 className="text-3xl font-bold mb-2 text-primary">Welcome to <span className="font-brand text-primary">{APP_NAME}</span>!</h1>
+        <p className="text-slate-600 dark:text-slate-400 mb-6 font-medium">
+          We just sent a confirmation link to <span className="font-bold text-primary">{email}</span>.
+          <br />Tap the link to verify your account.
         </p>
         <div className="space-y-3">
-          <Button onClick={markVerified} className="w-full rounded-2xl h-12">
+          <Button onClick={markVerified} className="w-full rounded-2xl h-12 bg-primary hover:bg-primary/90 text-white font-bold border-2 border-primary hover:border-primary/80">
             I clicked the email, continue
           </Button>
-          <Button onClick={resend} variant="outline" disabled={seconds > 0 || sending} className="w-full rounded-2xl h-12">
+          <Button onClick={resend} variant="outline" disabled={seconds > 0 || sending} className="w-full rounded-2xl h-12 border-2 border-slate-300 dark:border-slate-600 hover:border-primary hover:bg-primary/10 font-bold text-slate-700 dark:text-slate-300">
             {seconds > 0 ? `Resend available in ${seconds}s` : sent ? "Sent! Resend again" : sending ? "Sending..." : "Resend email"}
           </Button>
         </div>
